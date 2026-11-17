@@ -1,11 +1,10 @@
-// Generates the report nameplates (site/brand/nameplates/*.svg and index.json): the subject word
-// from site/site.ts (in the accent) and the Chinese title, set solid in Noto Sans SC Black
-// (SIL OFL 1.1) as SVG paths, so the nameplate is one static logotype on every system. The Latin
-// capitals are scaled to stand as tall as the Chinese glyphs, both centred on one line, and the spacing
-// is set by ink, pair by pair.
+// Gera os cabeçalhos dos resumos (site/brand/nameplates/*.svg e index.json): o nome do site
+// (site/site.ts, na cor de destaque) e o tipo do resumo, em Noto Sans SC Black (SIL OFL 1.1) como
+// caminhos SVG, para o cabeçalho ser um logotipo estático em qualquer sistema. Letras latinas e
+// ideogramas (se houver) ficam centrados na mesma linha, e o espaçamento é medido pela tinta, par a par.
 //
-// Usage: node scripts/nameplates.ts <@fontsource/noto-sans-sc package directory>
-//   (fetch it with `npm pack @fontsource/noto-sans-sc@5.3.0` and untar; it is not a dependency)
+// Uso: node scripts/nameplates.ts <pasta do pacote @fontsource/noto-sans-sc>
+//   (baixe com `npm pack @fontsource/noto-sans-sc@5.3.0` e descompacte; não é dependência)
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import opentype from "opentype.js";
@@ -14,40 +13,40 @@ import { SITE } from "@aihot/site";
 const pkg = process.argv[2];
 if (!pkg) throw new Error("usage: node scripts/nameplates.ts <noto-sans-sc package dir>");
 
-/** Ink height of the Chinese glyphs, in the nameplate's units. */
+/** Altura da tinta dos ideogramas, nas unidades do cabeçalho. */
 const H = 220;
-/** Latin capitals a touch shorter than the ideographs, which read larger. */
+/** Maiúsculas latinas um pouco mais baixas que os ideogramas, que parecem maiores. */
 const CAPS = H * 0.94;
 const MARGIN = 12;
-const isLatin = (ch: string) => /[A-Za-z]/.test(ch);
-/** Space between the inks of two neighbours. */
+const isLatin = (ch: string) => /\p{Script=Latin}/u.test(ch);
+/** Espaço entre as tintas de dois vizinhos. */
 function gap(a: string, b: string): number {
   if (isLatin(a) && isLatin(b)) return H * 0.07;
   if (isLatin(a) !== isLatin(b)) return H * 0.17;
   return H * 0.085;
 }
 
-const S = SITE.subject;
+const S = SITE.name.toUpperCase();
 const NAMEPLATES: Record<string, Array<{ text: string; accent: boolean }>> = {
   daily: [
     { text: S, accent: true },
-    { text: "日报", accent: false },
+    { text: "DIÁRIO", accent: false },
   ],
   weekly: [
     { text: S, accent: true },
-    { text: "周报", accent: false },
+    { text: "SEMANAL", accent: false },
   ],
   monthly: [
     { text: S, accent: true },
-    { text: "月报", accent: false },
+    { text: "MENSAL", accent: false },
   ],
   archive: [
-    { text: "日报", accent: false },
-    { text: "合订本", accent: true },
+    { text: "ARQUIVO", accent: true },
+    { text: "DIÁRIO", accent: false },
   ],
 };
 
-// Which woff slice of the 900 weight holds each character.
+// Qual fatia woff do peso 900 tem cada caractere.
 const css = readFileSync(path.join(pkg, "900.css"), "utf8");
 const faces = [...css.matchAll(/url\(\.\/files\/([\w-]+)\.woff2\)[^;]*;\s*unicode-range: ([^;]+);/g)].map((m) => ({
   file: `${m[1]}.woff`,
@@ -65,8 +64,8 @@ function fontFor(ch: string): opentype.Font {
   return fonts.get(face.file)!;
 }
 
-// One scale for all the Chinese glyphs and one for the capitals, from their union ink at 1000 units;
-// both are centred on the same line.
+// Uma escala para os ideogramas e outra para as maiúsculas, pela tinta somada a 1000 unidades;
+// as duas centradas na mesma linha.
 const chars = [...new Set(Object.values(NAMEPLATES).flatMap((parts) => parts.flatMap((p) => [...p.text])))];
 const boxes = new Map(chars.map((ch) => [ch, fontFor(ch).getPath(ch, 0, 0, 1000).getBoundingBox()]));
 function fit(group: string[], height: number) {
@@ -75,8 +74,8 @@ function fit(group: string[], height: number) {
   const size = (1000 * height) / (bottom - top);
   return { size, baseline: -((top + bottom) / 2) * (size / 1000) };
 }
-const cjk = fit(chars.filter((ch) => !isLatin(ch)), H);
-const latin = chars.some(isLatin) ? fit(chars.filter(isLatin), CAPS) : cjk;
+const latin = fit(chars.filter(isLatin), CAPS);
+const cjk = chars.some((ch) => !isLatin(ch)) ? fit(chars.filter((ch) => !isLatin(ch)), H) : latin;
 
 const out: Record<string, { viewBox: string; accent: string; ink: string }> = {};
 for (const [name, parts] of Object.entries(NAMEPLATES)) {

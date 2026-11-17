@@ -1,14 +1,14 @@
-# 行业包
+# Pacote do setor
 
-这个行业的知识都在这里：分类、主题、信源、精选标准和门槛。换一个行业，主要就是改这个文件夹和 [`site/`](../site/)（站名、文案、品牌和页面），步骤见 [把它改成你的行业](../docs/customize.md)。
+Todo o conhecimento do setor fica aqui: categorias, temas, fontes, critérios e limites da seleção. Para trocar de setor, basicamente se mexe nesta pasta e em [`site/`](../site/) (nome do site, textos, marca e páginas). O passo a passo está em [Adapte ao seu setor](../docs/customize.md).
 
-| 文件 | 内容 |
+| Arquivo | Conteúdo |
 |---|---|
-| `taxonomy.ts` | 分类、标签、公司与机构、防止模型写错公司的词表，这个行业最受关注的那类发布（`RELEASE`） |
-| `topics.json` | 主题目录（`/topics`），站点启动时读取 |
-| `sources.json` | 首次启动时导入的示范信源 |
-| `prompts/` | 每一步的提示词：预筛、评分、写作、结构化、归组、事件综述、周报月报、翻译 |
-| `selection.ts` | 入选门槛 |
-| `gold.example.jsonl` | 精选评测样本的格式示例 |
-| `relation-gold.example.jsonl` | 事件关系评测样本的格式示例 |
-| `story-digest-eval.example.jsonl` | 事件综述评测案例的格式示例 |
+| `taxonomy.ts` | Categorias, tags, empresas e instituições, a lista de nomes que impede o modelo de errar empresas e o tipo de lançamento que mais importa neste setor (`RELEASE`) |
+| `topics.json` | Diretório de temas (`/topics`), lido quando o site inicia |
+| `sources.json` | Fontes de exemplo importadas na primeira inicialização |
+| `prompts/` | Os prompts de cada etapa: pré-filtro, nota, redação, estruturação, agrupamento, resumo de evento, resumo semanal e mensal, tradução |
+| `selection.ts` | Limites para entrar na seleção |
+| `gold.example.jsonl` | Exemplo de formato das amostras de avaliação da seleção |
+| `relation-gold.example.jsonl` | Exemplo de formato das amostras de avaliação da relação entre eventos |
+| `story-digest-eval.example.jsonl` | Exemplo de formato dos casos de avaliação do resumo de evento |

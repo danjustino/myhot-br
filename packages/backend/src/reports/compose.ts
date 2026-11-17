@@ -74,13 +74,13 @@ async function saveReport(kind: ReportKind, key: string, start: Date, end: Date,
   });
 }
 
-/** "10 月 4 日 08:00": one end of a quiet issue's window, as its lead paragraph names it. */
+/** "4 out 08:00": one end of a quiet issue's window, as its lead paragraph names it. */
 function windowPoint(at: Date): string {
   const day = beijingDate(at);
   return `${Number(day.slice(8, 10))}/${day.slice(5, 7)} ${beijingTime(at)}`;
 }
 
-/** The highlights a daily's front page lists after its lead (今日看点). */
+/** The highlights a daily's front page lists after its lead (Destaques do dia). */
 const DAILY_HIGHLIGHTS = 3;
 
 /**

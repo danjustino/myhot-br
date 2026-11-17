@@ -1,17 +1,17 @@
-// 站点身份和读者看得到的文案。换成你的行业时，先改这个文件。
-// 网页和后端都读它；改完重新构建（docker compose up --build）即可生效。
-// 域名不在这里：部署时用环境变量 SITE_URL 设置。
+// Identidade do site e os textos que o leitor vê. Ao adaptar para o seu setor, comece por este arquivo.
+// O site e o backend leem daqui; depois de mudar, reconstrua (docker compose up --build) para valer.
+// O domínio não fica aqui: no deploy, defina a variável de ambiente SITE_URL.
 
 import type { Founder } from "@aihot/contracts/site-config";
 
 /**
- * 日报、周报、月报什么时候出（北京时间，HH:mm）：日报收这个时间之前的 24 小时，周报在每个自然周之后的周一出，
- * 月报在每月 1 日出。排程、成刊时间窗口、缺期告警和所有提到时间的文案都读它（public/ 里的文件写占位
- * {{dailyTime}}、{{weeklyTime}}、{{monthlyTime}}）；排程每半小时检查一次，所以写整点或半点。
+ * Quando saem o diário, o semanal e o mensal (horário de Brasília, HH:mm): o diário cobre as 24 horas antes deste horário, o semanal sai na segunda depois de cada semana,
+ * e o mensal no dia 1º de cada mês. Agendamento, janela das edições, alerta de edição faltando e todos os textos com horário leem daqui (os arquivos de public/ usam os marcadores
+ * {{dailyTime}}, {{weeklyTime}}, {{monthlyTime}}); o agendamento verifica a cada meia hora, então use hora cheia ou meia hora.
  */
 export const EDITION_TIMES = { daily: "08:00", weekly: "10:00", monthly: "10:30" };
 
-/** “每天 08:00”“每周一 10:00”“每月 1 日 10:30”：写进句子里的出刊时间。 */
+/** "todo dia às 08:00", "toda segunda às 10:00", "todo dia 1º às 10:30": o horário de publicação escrito dentro das frases. */
 export const EDITION_WHEN = {
   daily: `todo dia às ${EDITION_TIMES.daily}`,
   weekly: `toda segunda-feira às ${EDITION_TIMES.weekly}`,
@@ -19,146 +19,146 @@ export const EDITION_WHEN = {
 };
 
 export const SITE = {
-  /** 站名：导航、页面标题、分享图、RSS、MCP、后台都用它。 */
+  /** Nome do site: navegação, títulos das páginas, imagens de compartilhamento, RSS, MCP e painel usam este nome. */
   name: "MyHOT",
   /**
-   * 行业词：拼进默认说法里，比如“AI 日报”“AI 动态”。
-   * 改成“法律”“HR”“黄金”之类，页面上就会变成“法律日报”“法律动态”。
+   * Termo do setor: entra nos textos padrão. No original chinês virava algo como "Resumo de IA";
+   * trocando por "direito", "RH" ou "agro", a página passa a falar do novo setor.
    */
   subject: "tecnologia",
-  /** 首页的完整标题（浏览器标签、搜索结果）。 */
+  /** Título completo da página inicial (aba do navegador, resultados de busca). */
   homeTitle: "MyHOT — Notícias de tecnologia · Seleção diária e resumo do dia",
-  /** 主题目录页（/topics）的标题。 */
+  /** Título do diretório de tópicos (/topics). */
   topicsTitle: "Tópicos de tecnologia: últimas notícias por empresa, área e formato",
-  /** 反馈表单输入框里的示例。 */
+  /** Exemplo no campo de texto do formulário de feedback. */
   feedbackExample: "Por exemplo: ao buscar uma palavra-chave aconteceu… eu queria…",
-  /** 反馈页标题下面的一句话。 */
+  /** A frase sob o título da página de feedback. */
   feedbackLead: "Achou um bug, quer um recurso ou algo te incomodou? Conta pra gente.",
-  /** 反馈表单邮箱框里的提示。 */
+  /** A dica no campo de e-mail do formulário de feedback. */
   feedbackEmailHint: "Deixe seu e-mail se quiser resposta",
-  /** 一句话介绍：搜索引擎、分享卡片、RSS、llms.txt 会用。 */
+  /** Apresentação em uma frase: buscadores, cartões de compartilhamento, RSS e llms.txt usam. */
   description: `Seleciona as notícias de tecnologia que valem a leitura, junta as matérias sobre o mesmo assunto e publica um resumo ${EDITION_WHEN.daily}.`,
-  /** llms.txt 里一句话介绍下面的一段详细介绍（选填）。 */
+  /** Apresentação detalhada abaixo da frase de apresentação no llms.txt (opcional). */
   llmsIntro: null as string | null,
-  /** 一行小字：分享图、海报下方。 */
+  /** Uma linha em letra pequena: embaixo das imagens de compartilhamento e dos pôsteres. */
   tagline: "As notícias de tecnologia que importam",
-  /** 搜索引擎读到的关键词（首页结构化数据）。 */
+  /** Palavras-chave lidas pelos buscadores (dados estruturados da página inicial). */
   keywords: ["notícias de tecnologia", "tecnologia", "celulares", "games", "inteligência artificial", "resumo de tecnologia"] as string[],
   /**
-   * 搜索引擎站长平台的网站验证（选填）：meta 名 → 平台给的验证码，放在首页的 head 里。
-   * 比如 "baidu-site-verification": "codeva-…"、"msvalidate.01": "…"。验证通过后也要留着，平台会定期复查。
+   * Verificação do site em plataformas de webmaster (opcional): nome do meta → código da plataforma, colocado no head da página inicial.
+   * Por exemplo "google-site-verification": "…", "msvalidate.01": "…". Mantenha depois de verificado: a plataforma confere de tempos em tempos.
    */
   siteVerification: {} as Record<string, string>,
-  /** 网站开始收录的年份（结构化数据的时间范围，选填）。 */
+  /** Ano em que o site começou a coletar (intervalo de tempo dos dados estruturados, opcional). */
   since: null as string | null,
-  /** 界面语言（HTML lang、og:locale）。 */
+  /** Idioma da interface (HTML lang, og:locale). */
   locale: "pt-BR",
-  /** 默认域名，只在没设置 SITE_URL 时使用。 */
+  /** Domínio padrão, usado só quando SITE_URL não está definido. */
   defaultUrl: "http://localhost:3000",
-  /** 标准图标（favicon.ico、icon.png、icon-192.png、apple-icon.png、logo.svg）以外也放在网站根目录的图标，site/brand/ 里的文件名（选填）；manifest.webmanifest 或外站引用了它们时用。 */
+  /** Ícones extras na raiz do site além dos padrão (favicon.ico, icon.png, icon-192.png, apple-icon.png, logo.svg), pelo nome do arquivo em site/brand/ (opcional); para quando o manifest.webmanifest ou outros sites os referenciam. */
   rootIcons: [] as string[],
   /**
-   * MCP 工具名的前缀（小写字母、数字、下划线），工具会叫 myhot_get_latest、myhot_search……
-   * 已经有人接入后就不要再改。
+   * Prefixo dos nomes das ferramentas MCP (letras minúsculas, números, sublinhado); as ferramentas se chamam myhot_get_latest, myhot_search…
+   * Não mude depois que alguém se conectar.
    */
   mcpPrefix: "myhot",
   /**
-   * 公开接口（MCP、OpenAPI、llms.txt）的版本号，只升不降。
-   * 改了接口里已有的字段或含义时升主版本，并在部署说明里写清。
+   * Versão das interfaces públicas (MCP, OpenAPI, llms.txt); só sobe, nunca desce.
+   * Ao mudar um campo existente ou o significado dele, suba a versão principal e explique nas notas de deploy.
    */
   interfaceVersion: "4.0.0",
-  /** 对外联系邮箱（选填）：llms.txt 和给 Agent 的使用说明里会写。 */
+  /** E-mail de contato público (opcional): aparece no llms.txt e nas instruções para agentes. */
   contactEmail: null as string | null,
-  /** 关于页底部的一行小字（选填）。 */
+  /** Uma linha em letra pequena no fim da página Sobre (opcional). */
   footerNote: "Feito com o framework open source AIHOT",
-  /** 中国大陆网站的 ICP 备案号（选填），填了就显示在侧栏底部和“我的”页底部，并链接到工信部备案系统。 */
+  /** Número de registro ICP de sites da China continental (opcional); preenchido, aparece no fim da barra lateral e da página "Meu", com link para o sistema de registro do MIIT. */
   icp: null as string | null,
-  /** 中国大陆网站的公安备案信息（选填），填了显示在侧栏底部和“我的”页底部。 */
+  /** Registro na segurança pública de sites da China continental (opcional); preenchido, aparece no fim da barra lateral e da página "Meu". */
   psb: null as string | null,
-  /** 源码的 GitHub 仓库地址（选填），填了就在侧栏底部和“我的”页底部显示“GitHub 开源”。 */
+  /** Endereço do repositório no GitHub (opcional); preenchido, aparece "Código aberto no GitHub" no fim da barra lateral e da página "Meu". */
   github: null as string | null,
-  /** 页脚的“由 X 驱动”（选填）：填了就在侧栏底部和“我的”页底部显示，链到它的网址。默认链回上游 AIHOT，不想要就写 null。 */
+  /** O "Feito com X" do rodapé (opcional): preenchido, aparece no fim da barra lateral e da página "Meu", com link para o endereço. O padrão aponta para o AIHOT original; para tirar, use null. */
   poweredBy: { name: "AIHOT", url: "https://aihot.news" } as { name: string; url: string } | null,
-  /** 结构化数据里的网站运营者（搜索引擎用）。 */
+  /** O operador do site nos dados estruturados (para buscadores). */
   organization: {
     name: "MyHOT",
-    /** 创始人（选填）。 */
+    /** Fundador (opcional). */
     founder: null as Founder | null,
   },
-  /** 抓取信源时报上的名字和版本（User-Agent 里用），不要冒用别的站。 */
+  /** Nome e versão informados ao coletar as fontes (no User-Agent); não use o nome de outro site. */
   crawlerName: "MyHOTBot/1.0",
 } as const;
 
-/** 使用规则和隐私说明两页（正文在 pages/ 里）。 */
+/** As páginas de termos de uso e de privacidade (o texto fica em pages/). */
 export const POLICY = {
   terms: {
-    /** 页面名：导航、页脚、页面标题都用它。 */
+    /** Nome da página: navegação, rodapé e título da página usam. */
     name: "Termos de uso",
     description: "Regras de uso das páginas, do RSS, da API pública e do MCP deste site.",
-    /** llms.txt 里对这一页的一句说明（选填）。 */
+    /** Frase sobre esta página no llms.txt (opcional). */
     covers: null as string | null,
-    /** Agent 接入页的 RSS、API 两栏各自提醒的使用规则（选填）。 */
+    /** Lembretes de uso nas colunas de RSS e API da página de conexão para agentes (opcional). */
     notes: null as null | { rss: string; api: string },
     /**
-     * 讲清哪些用途要先取得授权的话（选填）：llms 接在 llms.txt“使用说明”的版权说明后面，
-     * agent 写在给 Agent 的使用说明“使用规则”一节的开头。
+     * Texto que explica quais usos exigem autorização prévia (opcional): llms vem depois do aviso de direitos autorais em "Instruções de uso" do llms.txt,
+     * e agent vai no início da seção "Regras de uso" das instruções para agentes.
      */
     license: null as null | { llms: string; agent: string },
     /**
-     * 公开 API、RSS 和 OpenAPI 文件声明使用规则的响应头（选填）：原样附上，再加一个指向这一页的
-     * Link 头（rel="terms-of-service"）；浏览器里的调用方也读得到它们。
+     * Cabeçalhos de resposta que declaram as regras de uso na API pública, no RSS e no arquivo OpenAPI (opcional): são anexados como estão, mais um cabeçalho
+     * Link apontando para esta página (rel="terms-of-service"); quem chama pelo navegador também consegue lê-los.
      */
     headers: null as null | Record<string, string>,
   },
   privacy: {
     description: "Como este site trata dados locais do navegador, feedbacks e registros de acesso.",
-    /** llms.txt 里对这一页的一句说明（选填）。 */
+    /** Frase sobre esta página no llms.txt (opcional). */
     covers: null as string | null,
   },
   /**
-   * X 帖子本身的文字和图片算不算全文：算的话，只在这篇允许站内全文时显示（信源允许全文、正文也取到了）；
-   * 不算的话总是显示，和标题、摘要一样。
+   * Se o texto e as imagens do próprio post do X contam como texto completo: se contam, só aparecem quando o item permite texto completo no site (a fonte permite e o corpo foi obtido);
+   * se não contam, aparecem sempre, como o título e o resumo.
    */
   xPostIsFullText: true,
 } as const;
 
-/** 导航（电脑侧栏、手机底栏、“我的”页）。 */
+/** Navegação (barra lateral do computador, barra inferior do celular, página "Meu"). */
 export const NAV = {
   /**
-   * 不放进导航的引擎入口，目前只支持热点榜（"/hot"）和主题（"/topics"）。页面照样能打开；原来回到它的返回按钮和链接改回精选，
-   * 写 "/hot" 时首页也不放当前热点。
+   * Entradas do motor que ficam fora da navegação; por enquanto só em alta ("/hot") e tópicos ("/topics"). A página continua abrindo; botões de voltar e links que levavam a ela passam a levar à seleção,
+   * e com "/hot" a página inicial também deixa de mostrar o que está em alta.
    */
   hidden: [] as Array<"/hot" | "/topics">,
 };
 
-/** 条目卡片和详情页上的几处说法和显示。 */
+/** Alguns termos e exibições nos cartões dos itens e na página de detalhe. */
 export const ITEM_COPY = {
-  /** 模型写的那句理由叫什么：卡片、详情页、Markdown 导出、给 Agent 的回答和群推送都用它。 */
+  /** O nome da frase de motivo escrita pelo modelo: cartões, página de detalhe, exportação em Markdown, respostas para agentes e envios para grupos usam. */
   reasonLabel: "Por que ler",
-  /** 读者在网页和分享图上看不看得到 AI 评分。只管显示：公开 API 和 MCP 的数据照样带 score，后台照常显示。 */
+  /** Se o leitor vê a nota da IA no site e nas imagens de compartilhamento. Só controla a exibição: a API pública e o MCP continuam trazendo score, e o painel continua mostrando. */
   showScore: true,
 };
 
-/** 关于页的一张二维码卡片。 */
+/** Um cartão de QR code da página Sobre. */
 interface ContactCard {
   kind: string;
   title: string;
   note: string;
-  /** 站外链接过的根目录文件名（选填），比如 qr-wechat.jpg：这个地址总是跳到现在的二维码。 */
+  /** Nome de arquivo na raiz já linkado por outros sites (opcional), como qr-wechat.jpg: esse endereço sempre redireciona para o QR code atual. */
   alias?: string;
 }
 
-/** 关于页的文案。数字（信源数、收录数、精选数、日报期数）来自站内实时统计，不用写在这里。 */
+/** Textos da página Sobre. Os números (fontes, itens coletados, destaques, edições do diário) vêm das estatísticas em tempo real do site e não precisam ser escritos aqui. */
 export const ABOUT = {
   kicker: `Sobre o ${SITE.name}`,
-  /** 页面描述（搜索结果、分享卡片）。 */
+  /** Descrição da página (resultados de busca, cartões de compartilhamento). */
   description: `Sobre o ${SITE.name}: ${SITE.description}`,
-  /** 大标题：第一行正常颜色，第二行强调色。 */
+  /** Título grande: a primeira linha na cor normal e a segunda na cor de destaque. */
   headline: ["Todo dia sai muita notícia de tecnologia.", "Só algumas valem o seu tempo."] as [string, string],
-  /** 标题下面的一段话。{sources} 会换成实时的信源数（两边自动加空格，所以 {sources} 两边不写空格）；统计没取到时换成 sourcesFallback。 */
+  /** O parágrafo sob o título. {sources} vira o número de fontes em tempo real (com espaços acrescentados dos dois lados, então não escreva espaços em volta de {sources}); se a estatística não vier, usa sourcesFallback. */
   lead: `O ${SITE.name} acompanha{sources}fontes por você: coleta, agrupa, pontua e seleciona, e publica um resumo ${EDITION_WHEN.daily}. Grátis, sem cadastro.`,
   sourcesFallback: "dezenas de",
-  /** 信源河动画下面的四个环节。 */
+  /** As quatro etapas sob a animação do rio de fontes. */
   steps: {
     collect: "Acompanha blogs oficiais, veículos de imprensa e criadores; quem publica mais é visitado com mais frequência, até a cada 15 minutos.",
     store: "Tudo o que é coletado fica guardado, e as matérias sobre o mesmo assunto são agrupadas; é daí que sai a lista do que está em alta.",
@@ -166,9 +166,9 @@ export const ABOUT = {
     publish: `Resumo diário ${EDITION_WHEN.daily}, semanal ${EDITION_WHEN.weekly} e mensal ${EDITION_WHEN.monthly}.`,
   },
   /**
-   * 作者块（选填），null 就不显示。
-   * avatarSourceId：一个 X 账号信源的 id，头像取它的（选填）。
-   * 二维码在后台“设置”里上传，或者放进 site/brand/contact/；没有二维码就不显示那张卡片。
+   * Bloco do autor (opcional); com null, não aparece.
+   * avatarSourceId: id de uma fonte de conta do X, de onde vem a foto (opcional).
+   * Os QR codes são enviados em "Configurações" no painel ou colocados em site/brand/contact/; sem QR code, o cartão não aparece.
    */
   maker: null as null | {
     name: string;
@@ -177,81 +177,81 @@ export const ABOUT = {
     wechat?: ContactCard;
     feishu?: ContactCard;
   },
-  /** 页面底部的版权与下架说明，中间接“反馈页”的链接。 */
+  /** O aviso de direitos autorais e de remoção no fim da página, com o link da "página de feedback" no meio. */
   copyright: [`O ${SITE.name} é um agregador de resumos e índice de leitura; os direitos dos originais pertencem a cada fonte. Se você representa uma fonte e quer corrigir, remover ou mudar a forma de exibição, use a`, "página de contato."] as [string, string],
-  /** 页面底部“使用规则”链接的锚点 id（选填）：外部文档写死过这个锚点就填上，以后不要改。 */
+  /** O id da âncora do link "Termos de uso" no fim da página (opcional): preencha se documentos externos já fixaram essa âncora, e não mude depois. */
   termsAnchor: null as string | null,
 } as const;
 
-/** 后台页面上给管理员的提示（选填）。 */
+/** Dicas para o administrador nas páginas do painel (opcional). */
 export const ADMIN = {
-  /** “反馈”页标题下的一行。 */
+  /** Uma linha sob o título da página "Feedback". */
   feedbackNote: null as string | null,
-  /** 确认框里补的一句本站规定：封禁反馈来源时。 */
+  /** Uma frase com a regra do site acrescentada na caixa de confirmação: ao bloquear a origem de um feedback. */
   banNote: null as string | null,
-  /** 确认框里补的一句本站规定：调整付费服务的请求上限时。 */
+  /** Uma frase com a regra do site acrescentada na caixa de confirmação: ao ajustar o limite de requisições de um serviço pago. */
   budgetNote: null as string | null,
 };
 
-/** Agent 接入页的示例。 */
+/** Exemplos da página de conexão para agentes. */
 export const AGENT = {
-  /** MCP 工具表里“搜索”一行：能搜什么、可以怎么问。 */
+  /** A linha "busca" da tabela de ferramentas MCP: o que dá para buscar e como perguntar. */
   search: { scope: "Busca dos últimos 7 dias por empresa, produto, pessoa ou assunto", ask: "O que essa empresa lançou recentemente?" },
 };
 
-/** 日报、周报、月报版面上的说法。 */
+/** Termos usados nos resumos diário, semanal e mensal. */
 export const REPORTS = {
-  /** 报头下面的出版者一行。 */
+  /** A linha do editor sob o cabeçalho. */
   imprint: SITE.name.toUpperCase(),
-  /** 报头旁边的一个词。 */
+  /** Uma palavra ao lado do cabeçalho. */
   motto: SITE.subject as string,
-  /** 每种报告页面的描述（搜索结果、分享卡片），不带句号；llms.txt 介绍周报、月报时也用它。 */
+  /** Descrição da página de cada tipo de resumo (resultados de busca, cartões de compartilhamento), sem ponto final; o llms.txt também usa ao apresentar o semanal e o mensal. */
   descriptions: {
     daily: `Resumo diário do ${SITE.name}, publicado ${EDITION_WHEN.daily} (horário de Brasília)`,
     weekly: `Resumo semanal de ${SITE.subject}`,
     monthly: `Balanço mensal de ${SITE.subject}`,
   },
   /**
-   * 一期里的一条怎么称呼（“4 件大事”）：没有头条时的标题（“这一天的 4 件 AI 大事”）、报头和往期目录的条数、
-   * 周报月报没有总述时的那句话，以及订阅说明里的“按栏目分好的大事”都用它。
+   * Como chamar um item da edição ("4 notícias principais"): o título quando não há manchete ("As 4 notícias principais do dia"), a contagem no cabeçalho e no índice de edições,
+   * a frase do semanal e do mensal sem resumo geral, e as "notícias principais por seção" das instruções de assinatura usam.
    */
   entry: { measure: "", noun: "notícias principais" },
-  /** 报头上其余几个数字后面的说法；精选数和日报期数在关于页、主题页也这样写。 */
+  /** O termo depois dos outros números do cabeçalho; o número de destaques e de edições do diário também aparecem assim nas páginas Sobre e de tópico. */
   metricUnits: { sourcesCount: "fontes", firstPartyEvents: "anúncios oficiais", selectedCount: "selecionadas", reportsCovered: "resumos diários" },
-  /** 报告分享图上“共几条”的说法。 */
+  /** O termo de "quantos itens no total" na imagem de compartilhamento do resumo. */
   shareUnit: "notícias principais",
-  /** 日报时段内有资料经过评判、但没有新大事时的标题与导语。 */
+  /** Título e chamada quando, no período do diário, houve itens avaliados mas nenhuma notícia grande nova. */
   quiet: { title: "Dia tranquilo, nada de grande aconteceu", paragraph: "Entre {start} e {end} (horário de Brasília), nenhuma notícia importante nova." },
 };
 
-/** 运维告警（只发给站长）里随部署而变的几处说法。 */
+/** Alguns termos dos alertas de operação (só para o dono do site) que mudam conforme o deploy. */
 export const ALERTS = {
-  /** 多少分钟没有收录新文章就告警“网站停止收录新内容”（最多一天）；环境变量 ALERT_QUIET_MINUTES 优先。 */
+  /** Quantos minutos sem artigo novo geram o alerta "o site parou de coletar conteúdo novo" (no máximo um dia); a variável de ambiente ALERT_QUIET_MINUTES tem prioridade. */
   quietMinutes: 360,
-  /** 编辑信源一直抓取成功、只是没有新文章时，多少分钟才告警（最多一天）。 */
+  /** Quantos minutos até alertar quando as fontes editoriais seguem coletando com sucesso, mas sem artigo novo (no máximo um dia). */
   quietWhileFetchingMinutes: 720,
-  /** 同一条告警里，“没有”后面补一句平时的收录量；null 就不写。 */
+  /** No mesmo alerta, uma frase depois de "nenhum" com o volume normal de coleta; com null, não escreve. */
   usualFlow: null as string | null,
-  /** worker 停了的告警里，怎么看它的日志。 */
+  /** No alerta de worker parado, como ver os logs dele. */
   workerLogs: "veja os logs do worker (docker compose logs worker)",
 };
 
-/** 后台新建信源时的默认设置。 */
+/** Configuração padrão ao criar uma fonte no painel. */
 export const SOURCE_DEFAULTS = {
-  /** 站内展示全文；false 时只显示摘要和原文链接。 */
+  /** Mostrar o texto completo no site; com false, só o resumo e o link do original. */
   siteFulltext: false,
 };
 
 /**
- * 社区站的信源（填信源 id）：算热度时按发帖的账号计，一个账号算一个独立来源，而不是整个信源只算一个。
- * dev 是 dev.to 的文章流，hn 是 Hacker News 的帖子流。
+ * Fontes de comunidade (pelo id da fonte): na popularidade, cada conta que publica conta como uma fonte independente, em vez de a fonte inteira contar como uma só.
+ * dev é o fluxo de artigos do dev.to, e hn é o fluxo de posts do Hacker News.
  */
 export const COMMUNITY_FEEDS: { dev: string[]; hn: string[] } = {
   dev: [],
   hn: [],
 };
 
-/** 各页分享图（/og/pages/*.png）上的文字。主题目录页的那张按主题数自动生成。 */
+/** Textos das imagens de compartilhamento das páginas (/og/pages/*.png). A do diretório de tópicos é gerada sozinha pelo número de tópicos. */
 export const CARDS: Record<string, { kicker: string; title: string; subtitle: string; accent?: "hot" | "amber" }> = {
   site: { kicker: "Seleção do dia", title: SITE.tagline, subtitle: SITE.description },
   all: { kicker: "Todas as notícias", title: "As últimas de todas as fontes, num lugar só", subtitle: "Notícias de todas as fontes em ordem cronológica, com filtro por categoria e tag." },
@@ -267,53 +267,53 @@ export const CARDS: Record<string, { kicker: string; title: string; subtitle: st
   agent: { kicker: "Para agentes", title: `Conecte o ${SITE.name} ao seu agente de IA`, subtitle: "MCP, RSS e API: anônimo, somente leitura, sem API Key." },
 };
 
-/** 公开接口的访问约定里随部署而变的几处：给 Agent 的使用说明、llms.txt 会写。 */
+/** Pontos do acordo de acesso às interfaces públicas que mudam conforme o deploy: aparecem nas instruções para agentes e no llms.txt. */
 export const ACCESS = {
-  /** 同一 IP 每分钟大约能请求多少次，超过会收到 429 并带 Retry-After（选填，由部署的反向代理限流）；null 表示不限流，说明里不提。 */
+  /** Quantas requisições por minuto o mesmo IP consegue fazer antes de receber 429 com Retry-After (opcional, limitado pelo proxy reverso do deploy); null significa sem limite, e as instruções não mencionam. */
   ratePerMinute: null as number | null,
-  /** 请写程序同步数据的人报上的 User-Agent（选填），写在 JSON 接口的说明后面。 */
+  /** O User-Agent pedido a quem escreve programas para sincronizar dados (opcional), escrito depois das instruções das interfaces JSON. */
   userAgent: null as string | null,
 };
 
-/** 这个部署自己的几处安排（选填）。 */
+/** Alguns arranjos próprios deste deploy (opcional). */
 export const DEPLOYMENT = {
-  /** 凭据分组文件（models.env、collectors.env……）默认放在哪个目录，相对仓库根目录；环境变量 AIHOT_CREDENTIALS_DIR 优先，都没有就只读环境变量。 */
+  /** Pasta padrão dos arquivos de credenciais por grupo (models.env, collectors.env…), relativa à raiz do repositório; a variável AIHOT_CREDENTIALS_DIR tem prioridade, e sem nenhuma das duas só as variáveis de ambiente são lidas. */
   credentialsDir: null as string | null,
-  /** 凭据分组的文件名（放在凭据目录下，选填）：没写的分组用“分组名.env”，比如 models.env。 */
+  /** Nomes dos arquivos de credenciais por grupo (na pasta de credenciais, opcional): grupos sem nome usam "grupo.env", como models.env. */
   credentialFiles: {} as Partial<Record<string, string>>,
-  /** 这个部署额外要求的凭据（[分组, 环境变量名]）；生产 API 启动时检查，默认没有额外要求。 */
+  /** Credenciais exigidas a mais por este deploy ([grupo, nome da variável]); conferidas quando a API de produção sobe; por padrão não há exigência extra. */
   requiredSecrets: [] as const,
-  /** 线上 api 收到的 Host（CDN 回源用的域名，选填）；本地开发时，网页开发服务器转给 api 的请求也换成它，和线上一致。 */
+  /** O Host recebido pela api em produção (o domínio de origem usado pela CDN, opcional); no desenvolvimento local, as requisições do servidor de desenvolvimento do site para a api também passam a usá-lo, igual à produção. */
   originHost: null as string | null,
-  /** 反向代理把没登录的后台访问转去登录时，用哪个请求头带上原来的地址（选填，登录后回到那里）。 */
+  /** Qual cabeçalho leva o endereço original quando o proxy reverso manda acessos sem login do painel para o login (opcional; depois do login, volta para lá). */
   loginReturnHeader: null as string | null,
   /**
-   * 图片代理从原站取图的流量上限：超过后没缓存的图先返回 503，等这一分钟或这一天过去，当天额度用完会进运营日报；
-   * null 就不设上限。环境变量 IMGPROXY_UPSTREAM_MB_PER_MINUTE、IMGPROXY_UPSTREAM_GB_PER_DAY 优先。
+   * Limite de tráfego do proxy de imagens ao buscar no site original: passou, imagens sem cache devolvem 503 até aquele minuto ou dia passar, e a cota diária esgotada entra no relatório de operação;
+   * com null, sem limite. As variáveis IMGPROXY_UPSTREAM_MB_PER_MINUTE e IMGPROXY_UPSTREAM_GB_PER_DAY têm prioridade.
    */
   imageUpstreamBudget: null as null | { mbPerMinute: number; gbPerDay: number },
   /**
-   * 已实测应由服务器直接连接、不走出网代理（EGRESS_PROXY_URL）的域名，采集和图片共用（选填）。
-   * 每次重定向重新按目标域名选路，直连仍检查实际连接地址。
+   * Domínios que, testados, devem ser acessados direto pelo servidor, sem o proxy de saída (EGRESS_PROXY_URL); valem para coleta e imagens (opcional).
+   * A cada redirecionamento a rota é escolhida de novo pelo domínio de destino, e o acesso direto ainda confere o endereço real da conexão.
    */
   directFetchHosts: [] as string[],
   /**
-   * 精选评测（scripts/eval-selection.ts）不带参数时用的金标集：文件（相对仓库根目录）、抽样条数、只抽哪一份、门槛扫描范围。
-   * null 就用 .data/gold.jsonl 的全部样本（最多 200 条），在 40–90 之间扫描。
+   * O conjunto marcado usado pela avaliação da seleção (scripts/eval-selection.ts) sem parâmetros: arquivo (relativo à raiz do repositório), número de amostras, qual parte usar e faixa da varredura de limites.
+   * Com null, usa todas as amostras de .data/gold.jsonl (até 200) e varre de 40 a 90.
    */
   selectionGold: null as null | { file: string; sample: number; split: string; sweep: [number, number] },
 };
 
-/** RSS 订阅源的说明里随站点而变的说法。 */
+/** Termos das descrições dos feeds RSS que mudam conforme o site. */
 export const FEED_COPY = {
-  /** “全部动态”源的说明里，除了未审内容、低相关条目、低分条目和已合并重复条目，还写明不含的内容（选填）。 */
+  /** Na descrição do feed "Todas as notícias", o que mais ele não traz além de conteúdo não avaliado, itens pouco relevantes, itens com nota baixa e repetidos já unidos (opcional). */
   allLeavesOut: [] as string[],
 };
 
 /**
- * 公开接口（API、RSS、MCP）里和网页不同的类别（选填）。上线后不要改：接口参数和订阅地址里有类别的 key。
- * merge：并进另一类发布的类别，key 是行业包里的类别，值是它并进的类别（公开接口比网页少一类时用）；
- * feedLabels：分类 RSS 标题里的名字，替换行业包里的 feedLabel（并进了别的类别时，名字常常也要跟着改）。
+ * Categorias das interfaces públicas (API, RSS, MCP) diferentes das do site (opcional). Não mude depois do lançamento: a key da categoria aparece em parâmetros e endereços de feed.
+ * merge: categorias publicadas dentro de outra; a chave é a categoria do pacote do setor e o valor é a categoria em que ela entra (para quando a interface pública tem uma categoria a menos que o site);
+ * feedLabels: o nome no título do RSS por categoria, substituindo o feedLabel do pacote do setor (ao entrar em outra categoria, o nome muitas vezes também precisa mudar).
  */
 export const PUBLIC_CATEGORIES = {
   merge: {},
@@ -321,7 +321,7 @@ export const PUBLIC_CATEGORIES = {
 } as const;
 
 /**
- * Names such as "Resumo diário". The Chinese original glued the subject onto the noun ("AI 日报"); in Portuguese the
+ * Names such as "Resumo diário". The Chinese original glued the subject onto the noun ("AI daily"); in Portuguese the
  * site name already says what the site covers, so the noun stands alone.
  */
 export function withSubject(noun: string): string {
@@ -340,22 +340,22 @@ function spokenTime(time: string): string {
 }
 
 /**
- * 入口页在搜索结果里的标题：读者会搜的词放前面，页面自动在最后接上“ · 站名”（首页用 SITE.homeTitle）。
- * 日期一律是这一期、这一页内容的日期，不是今天的日期。换行业时把里面的说法一起换掉。
+ * Títulos das páginas de entrada nos resultados de busca: as palavras que o leitor procura vêm primeiro, e a página acrescenta " · nome do site" no fim (a página inicial usa SITE.homeTitle).
+ * As datas são sempre as do conteúdo daquela edição ou página, não a de hoje. Ao trocar de setor, troque também os termos daqui.
  */
 export const SEO_TITLES = {
-  /** 热点榜（/hot）。 */
+  /** Em alta (/hot). */
   hot: "Em alta: os assuntos de tecnologia mais comentados hoje",
-  /** 全部动态（/all），不含搜索和筛选结果。 */
+  /** Todas as notícias (/all), sem os resultados de busca e de filtro. */
   all: "Últimas notícias de tecnologia: atualização contínua",
-  /** Agent 接入页（/agent）。 */
+  /** Página de conexão para agentes (/agent). */
   agent: "API, MCP e RSS de notícias de tecnologia: conecte ao seu agente",
-  /** 关于页（/about）的完整标题，已含站名。 */
+  /** Título completo da página Sobre (/about), já com o nome do site. */
   about: `Sobre o ${SITE.name}: ${SITE.tagline}`,
-  /** 日报、周报、月报的最新一期（/daily、/weekly、/monthly）；date 是这一期的日期：“11月7日”“10月26日—11月1日”“2026年10月”。 */
+  /** Edição mais recente do diário, semanal e mensal (/daily, /weekly, /monthly); date é a data da edição: "7 nov", "26 out – 1 nov", "outubro de 2026". */
   latestReport: (kind: "daily" | "weekly" | "monthly", date: string): string =>
     ({ daily: `Resumo diário de tecnologia (${date})`, weekly: `Resumo semanal: as notícias principais da semana (${date})`, monthly: `Resumo mensal: as notícias principais de ${date}` })[kind],
-  /** 主题页第一页：公司搜“最新消息”，方向和内容类型搜“最新进展”；updated 是最新一篇精选的日期（“11月7日”），没有时为 null。 */
+  /** Primeira página de um tópico: empresas buscam "últimas notícias", áreas e formatos buscam "últimos avanços"; updated é a data do destaque mais recente ("7 nov"), ou null. */
   topic: (name: string, group: "company" | "field" | "genre", updated: string | null): string =>
     `${name}: ${group === "company" ? "últimas notícias e novidades" : "últimas notícias e avanços"}${updated ? ` (atualizado em ${updated})` : ""}`,
 };

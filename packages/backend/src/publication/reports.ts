@@ -175,7 +175,7 @@ function periodOverview(content: Record<string, any>, kind: "weekly" | "monthly"
   return `${kind === "weekly" ? "Nesta semana" : "Neste mês"}, ${shown.length} ${REPORTS.entry.measure}${REPORTS.entry.noun}; as que mais chamaram atenção: ${shown.slice(0, 3).map((e) => e.title).join("; ")}.`;
 }
 
-/** A weekly or monthly's own headline; the composer's "<site name> 周报 · 2026-W38" names the issue, not its news. */
+/** A weekly or monthly's own headline; the composer's "<site name> Resumo semanal · 2026-W38" names the issue, not its news. */
 function periodicHeadline(content: Record<string, any>): string | null {
   const text = String(content.headline ?? content.title ?? "");
   const issueName = text.startsWith(`${SITE.name} `) && /^(Semanal|Mensal) · /.test(text.slice(SITE.name.length + 1));
@@ -519,7 +519,7 @@ export async function dailyWithNotes(date: string | "latest") {
   const links = (i: any) => ({ aihot: i.itemId ? itemUrl(i.itemId) : null, original: metadata(i).sourceUrl });
   const url = dailyUrl(r.key);
   const lead = c.lead || c.leadItemId ? issueLead(c, "daily", goneIn(avail)) : null;
-  // 今日看点 as the page lists them after the lead: the entries its highlights name and the reports a thin
+  // Destaques do dia as the page lists them after the lead: the entries its highlights name and the reports a thin
   // issue was filled with (picks), else its first entries; withdrawn ones are left out, as everywhere in v1.
   const named: string[] = c.highlights?.length ? c.highlights : items.slice(0, 3).map((i: any) => i.itemId);
   const highlights = named.map((id) => [...items, ...picks].find((i: any) => i.itemId === id))

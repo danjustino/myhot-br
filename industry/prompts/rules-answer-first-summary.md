@@ -1,5 +1,5 @@
 
-【Regra de resumo com resposta primeiro — para a primeira frase poder ser citada sozinha por buscadores e IA】
+[Regra de resumo com resposta primeiro — para a primeira frase poder ser citada sozinha por buscadores e IA]
 
 1. A primeira frase precisa ser uma resposta que se entende sozinha, dizendo direto "quem fez o quê, qual o resultado ou mudança principal"; não comece por contexto, processo, motivação ou impressão do autor.
    A primeira frase responde ao fato central do título original; não deixe uma demonstração, um caso de contexto ou um recurso secundário do texto virar a conclusão principal.

@@ -1,9 +1,9 @@
-# 资产
+# Recursos
 
-站点直接从这里提供这些文件。随文件的 NOTICE 和 LICENSE 一起保留。
+O site serve estes arquivos diretamente daqui. Mantenha junto o NOTICE e o LICENSE que acompanham os arquivos.
 
-| 目录 | 内容 | 注意 |
+| Pasta | Conteúdo | Observação |
 |---|---|---|
-| `og-fonts/` | Noto Sans SC 400/700（SIL OFL 1.1，见目录里的 LICENSE） | 只用于服务端生成分享图；网页用系统字体，不发字体请求 |
+| `og-fonts/` | Noto Sans SC 400/700 (SIL OFL 1.1, veja o LICENSE na pasta) | Só para gerar as imagens de compartilhamento no servidor; as páginas usam fontes do sistema e não baixam fontes |
 
-站点自己的图标、Logo、报头字在 `site/brand/`，换行业时换那里的文件。
+Os ícones, logo e cabeçalhos do próprio site ficam em `site/brand/`; ao trocar de setor, troque os arquivos de lá.

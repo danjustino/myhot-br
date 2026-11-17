@@ -36,7 +36,7 @@ export function dingtalkMarkdown(c: DingtalkContent): { title: string; text: str
   return { title: c.title, text };
 }
 
-/** The robot's secret (加签): without one the webhook URL goes out as configured. */
+/** The robot's signing secret: without one the webhook URL goes out as configured. */
 function signedUrl(url: string): string {
   const secret = credential("integrations", "DINGTALK_PUSH_SECRET");
   if (!secret) return url;

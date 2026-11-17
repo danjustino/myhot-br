@@ -55,7 +55,7 @@ const RANK_COLOR = ["text-rank-1", "text-rank-2", "text-rank-3"];
 const rankColor = (rank: number) => RANK_COLOR[rank - 1] ?? "text-rank-rest";
 const pad = (rank: number) => String(rank).padStart(2, "0");
 
-/** "某媒体、某账号 等 4 个来源 · 7 位参与者". */
+/** "Veículo X, Conta Y e mais 4 fontes · 7 participantes". */
 function Voices({ e }: { e: HotEntryView }) {
   const names = e.sourceNames.slice(0, 2);
   return (
@@ -239,7 +239,7 @@ function Row({ e }: { e: HotEntryView }) {
   );
 }
 
-/** Opens "热度是怎么算的" at the foot of the page and brings it into view. */
+/** Opens "Como o calor é calculado" at the foot of the page and brings it into view. */
 function showMethod() {
   const method = document.getElementById("hot-method") as HTMLDetailsElement | null;
   if (!method) return;

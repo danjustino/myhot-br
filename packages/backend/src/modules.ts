@@ -39,7 +39,7 @@ export interface ModelStep {
 export interface AgentAbility {
   /** Address under /api/v1/agent: "/status". */
   path: string;
-  /** Named in the guide's first sentence, after the engine's abilities: "服务状态". */
+  /** Named in the guide's first sentence, after the engine's abilities: "status do serviço". */
   title: string;
   /** The guide's table row: what the user wants to know. */
   ask: string;
@@ -63,11 +63,11 @@ export interface AgentAbility {
 export interface LlmsLines {
   /** The public API list, after the engine's news endpoints. */
   api?: string[];
-  /** Polling rhythm, a clause each, before the RSS one ("X 每 10 分钟读一次 …；"). */
+  /** Polling rhythm, a clause each, before the RSS one ("o X é lido a cada 10 minutos …;"). */
   pace?: string[];
   /** The site's main pages, after the topics. */
   pages?: string[];
-  /** What the topics section's opening sentence goes on to say about the topic pages, a clause each after "；". */
+  /** What the topics section's opening sentence goes on to say about the topic pages, a clause each after ";". */
   topics?: string[];
   /** Sentences after the access section's opening one. */
   access?: string[];
@@ -173,9 +173,9 @@ export interface ServerModule {
   http?: (app: FastifyInstance) => void;
   agent?: {
     abilities?: AgentAbility[];
-    /** The guide's "目前查不到的" list, after the engine's first entry. */
+    /** The guide's "ainda não dá para consultar" list, after the engine's first entry. */
     unavailable?: string[];
-    /** The guide's "请求" list (how to ask), after the engine's first entry. */
+    /** The guide's "como pedir" list (how to ask), after the engine's first entry. */
     requests?: string[];
   };
   llms?: () => Promise<LlmsLines> | LlmsLines;

@@ -159,7 +159,7 @@ function hostOf(url: string): string {
   }
 }
 
-/** The byline, unless the source's name already says it (公众号：卡尔的AI沃茨 by AI沃茨, Claude：YouTube by Claude). */
+/** The byline, unless the source's name already says it (Blog: Fulano by Fulano, Claude: YouTube by Claude). */
 function bylineOf(author: string | null, source: string): string | null {
   const key = (s: string) => s.toLowerCase().replace(/[\s\p{P}]/gu, "");
   const a = author ? key(author) : "";
@@ -167,7 +167,7 @@ function bylineOf(author: string | null, source: string): string | null {
   return a && !s.includes(a) && !a.includes(s) ? author : null;
 }
 
-/** "11月7日 AI 日报 · 头条": the daily that carries the article, named as the site names its issues. */
+/** "Resumo diário de 7 nov · Manchete": the daily that carries the article, named as the site names its issues. */
 function dailyName(daily: NonNullable<SiteItemDetail["daily"]>): string {
   return `${withSubject(REPORT_NAMES.daily)} de ${reportDateLabel("daily", daily.key)}${daily.lead ? " · manchete" : ""}`;
 }
@@ -394,7 +394,7 @@ function ItemView({ item, followups }: Loaded) {
       )}
     </Menu>
   );
-  // Phones: the same actions as a sheet from the bar (分享 and 原文 are on the toolbar).
+  // Phones: the same actions as a sheet from the bar (Compartilhar and Original are on the toolbar).
   const phoneActions: ActionRow[] = [
     { key: "poster", label: "Gerar imagem para compartilhar", icon: <IconImage size={20} />, onSelect: openPoster },
     { key: "copy", label: "Copiar link", icon: <IconCopy size={20} />, onSelect: () => void copyLink() },
@@ -414,7 +414,7 @@ function ItemView({ item, followups }: Loaded) {
       {originalLabel} <IconExternal size={13} />
     </a>
   );
-  // Desktop actions head the right rail, one row as tall as 返回 at the head of the left one.
+  // Desktop actions head the right rail, one row as tall as Voltar at the head of the left one.
   const actions = (
     <div className="flex items-center gap-1">
       {originalLink("flex-1 touch:h-11")}
@@ -523,8 +523,8 @@ function ItemView({ item, followups }: Loaded) {
           </>
         }
       >
-        {/* Between lg and 2xl the left rail is hidden: 返回 stays at the top while reading, as on the original site.
-            Below side the right rail is hidden too, and its actions and the outline join 返回. */}
+        {/* Between lg and 2xl the left rail is hidden: Voltar stays at the top while reading, as on the original site.
+            Below side the right rail is hidden too, and its actions and the outline join Voltar. */}
         <div className="sticky top-0 z-20 -mx-2 hidden items-center justify-between gap-3 bg-bg/95 px-2 py-1.5 backdrop-blur lg:flex 2xl:hidden">
           {backButton}
           <div className="flex items-center gap-1 side:hidden">

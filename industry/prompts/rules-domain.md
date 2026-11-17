@@ -1,5 +1,5 @@
 
-【Regras de tradução e redação de tecnologia — siga à risca】
+[Regras de tradução e redação de tecnologia — siga à risca]
 
 1. Escreva em português do Brasil, com o vocabulário que a imprensa de tecnologia brasileira usa:
    - smartphone / celular, notebook (não "laptop" nem "portátil"), tela (não "ecrã"), aplicativo ou app, atualização, armazenamento, bateria, carregador, fone de ouvido.

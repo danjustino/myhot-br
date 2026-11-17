@@ -159,7 +159,7 @@ export interface DailyReport {
   lead: { title: string; leadParagraph: string } | null;
   sections: { label: string; items: { title: string; summary: string; source: { name: string }; links: Links }[] }[];
   flashes: { title: string; publishedAt: string; source: { name: string }; links: Links }[];
-  /** 今日看点 as the page lists them after the lead; a thin issue's include reports outside its sections. */
+  /** Destaques do dia as the page lists them after the lead; a thin issue's include reports outside its sections. */
   highlights?: { title: string; summary: string; source: { name: string }; links: Links }[];
 }
 

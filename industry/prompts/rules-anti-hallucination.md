@@ -1,5 +1,5 @@
 
-【Regras contra alucinação — siga à risca】
+[Regras contra alucinação — siga à risca]
 
 1. É proibido acrescentar recursos, ferramentas, números, versões, valores padrão ou limites que o original não cita claramente.
 2. Na dúvida sobre um detalhe, omita; não "complete de um jeito que pareça razoável".
