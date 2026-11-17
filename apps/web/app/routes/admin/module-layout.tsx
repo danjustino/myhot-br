@@ -18,17 +18,17 @@ export async function loader({ request }: { request: Request }) {
 
 export const headers = () => ({ ...GRAY_HEADERS, "X-Robots-Tag": "noindex, nofollow" });
 
-export const meta = () => [{ title: `${SITE.name} 后台` }, { name: "robots", content: "noindex, nofollow" }];
+export const meta = () => [{ title: `Painel do ${SITE.name}` }, { name: "robots", content: "noindex, nofollow" }];
 
 export default function ModuleAdminLayout({ loaderData }: { loaderData: { name: string } }) {
   const navigation = useNavigation();
   const brand = (
     <span className="flex items-center gap-2">
       <RingMark className="size-6 text-accent" />
-      <span className="text-[15px] font-semibold tracking-tight text-ink">{`${SITE.name} 后台`}</span>
+      <span className="text-[15px] font-semibold tracking-tight text-ink">{`Painel do ${SITE.name}`}</span>
     </span>
   );
-  const back = `回到 ${SITE.name}`;
+  const back = `Voltar para o ${SITE.name}`;
   return (
     <div className="flex min-h-dvh bg-bg">
       <NavigationProgress active={navigation.state === "loading"} />

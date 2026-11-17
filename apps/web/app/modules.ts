@@ -103,7 +103,7 @@ export interface TopicPagePart {
   news: (data: unknown) => string[];
 }
 
-/** Where the reader's account shows: the 我的 page's first row, the desktop sidebar's foot, the 收藏 page's note, the 卡册. */
+/** Where the reader's account shows: the Meu page's first row, the desktop sidebar's foot, the Salvos page's note, the card album. */
 export type AccountPlace = "me" | "sidebar" | "starred" | "album";
 
 export interface WebModule {

@@ -57,7 +57,7 @@ export interface Collection<Local, Part> {
   fromDoc: (part: Part, now: number) => Local;
   readPart: (raw: unknown) => Part;
   empty: Local;
-  /** How many there are, for the account panel: "23 条收藏". */
+  /** How many there are, for the account panel: "23 salvos". */
   count: (value: Local) => number;
   unit: string;
 }

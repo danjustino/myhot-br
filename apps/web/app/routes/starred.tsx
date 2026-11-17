@@ -99,13 +99,13 @@ export default function StarredPage() {
 
   const action = "text-[12.5px] text-ink-3 transition-colors hover:text-accent";
   const Account = webModules().find((m) => m.account)?.account;
-  const localNote = <p className="rounded-tile border border-line bg-surface px-4 py-2.5 text-[12.5px] text-ink-3">不用登录，收藏直接存在这个浏览器里；清除浏览器数据或换设备都不会同步，换设备前可以先导出备份。</p>;
+  const localNote = <p className="rounded-tile border border-line bg-surface px-4 py-2.5 text-[12.5px] text-ink-3">Sem login: os salvos ficam guardados neste navegador; se você limpar os dados do navegador ou trocar de aparelho, eles não vão junto. Antes de trocar, exporte um backup.</p>;
   return (
     <div className="pb-12">
       <PhoneBar back={{ to: "/more", label: "Meu" }} title="Salvos" />
       <header className="flex flex-col gap-2 pb-4 pt-3 sm:flex-row sm:items-start sm:justify-between lg:pt-1">
         <div>
-          <h1 data-page-title="" className="text-[24px] font-semibold leading-[1.3] text-ink"Salvos</h1>
+          <h1 data-page-title="" className="text-[24px] font-semibold leading-[1.3] text-ink">Salvos</h1>
           <p className="mt-1.5 text-[13px] text-ink-3">{`Itens do ${SITE.name} salvos, para ler depois ou rever.`}</p>
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:pt-1.5">

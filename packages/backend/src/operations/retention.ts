@@ -42,7 +42,7 @@ export async function dailyRetention(now = new Date()) {
   const runs = await sql`DELETE FROM job_runs WHERE started_at < ${new Date(now.getTime() - 30 * 86400_000)} AND (status IS DISTINCT FROM 'failed' OR started_at < ${new Date(now.getTime() - 90 * 86400_000)})`;
   const monthMs = 30 * 86400_000;
   // Events the hub took (notify/agent.ts): their readers look back a day (handoff counts) or a week (Token
-  // 羊毛's effectiveness). Undelivered ones stay for their retries. An agent-only problem still open after
+  // deals module's effectiveness). Undelivered ones stay for their retries. An agent-only problem still open after
   // the month is handed over once more, which is wanted.
   const agentEvents = await sql`DELETE FROM settings WHERE key LIKE 'webhook.event.%' AND value->>'accepted' = 'true'
     AND (value->>'queuedAt')::timestamptz < ${new Date(now.getTime() - monthMs)}`;

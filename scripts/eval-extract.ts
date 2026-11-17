@@ -81,10 +81,10 @@ async function save(urls: string, out: string) {
     }
     pages.push(page);
     writeJson(path.join(out, "pages.json"), pages);
-    console.error(`${page.error ? `跳过：${page.error}` : "已保存"} ${url}`);
+    console.error(`${page.error ? `ignorado: ${page.error}` : "salvo"} ${url}`);
   }
   writeJson(path.join(out, "pages.json"), pages);
-  console.log(`保存 ${pages.filter(page => page.html).length} 篇，跳过 ${pages.filter(page => page.error).length} 篇。`);
+  console.log(`${pages.filter(page => page.html).length} salvas, ${pages.filter(page => page.error).length} ignoradas.`);
 }
 
 function run(pages: string, out: string) {
@@ -119,7 +119,7 @@ function run(pages: string, out: string) {
     results.push({ id: page.id, url: page.url, rules: page.rules, body, ...(error ? { error } : {}) });
   }
   writeJson(out, results);
-  console.log(`回放 ${results.length} 篇，提取到正文 ${results.filter(result => result.body).length} 篇。`);
+  console.log(`${results.length} reproduzidas, texto extraído de ${results.filter(result => result.body).length}.`);
 }
 
 // Counts preserve repeated paragraphs and repeated media: losing one copy is still a change.
@@ -138,21 +138,21 @@ function diff(a: string, b: string) {
   const old = new Map(before.map(page => [page.id, page]));
   const next = new Map(after.map(page => [page.id, page]));
   let unchanged = 0, layout = 0, words = 0, mediaOnly = 0, lostImages = 0, lostVideos = 0, unreadable = 0;
-  const lines = ["正文提取回放比较", ""];
+  const lines = ["Comparação da reprodução da extração de texto", ""];
   const clip = (text: string) => normalize(text).slice(0, 120);
   const changes = <T>(label: string, first: T[], second: T[], display: (item: T) => string) => {
-    for (const item of added(first, second)) lines.push(`  - 多了${label}：${display(item)}`);
-    for (const item of added(second, first)) lines.push(`  - 少了${label}：${display(item)}`);
+    for (const item of added(first, second)) lines.push(`  - ${label} a mais: ${display(item)}`);
+    for (const item of added(second, first)) lines.push(`  - ${label} a menos: ${display(item)}`);
   };
   for (const id of new Set([...old.keys(), ...next.keys()])) {
     const first = old.get(id), second = next.get(id);
     if (!first || !second) {
-      lines.push(`- ${second ? "新增样本" : "移除样本"}：${(second ?? first)!.url}`);
+      lines.push(`- ${second ? "amostra nova" : "amostra removida"}: ${(second ?? first)!.url}`);
       continue;
     }
     const x = first.body, y = second.body;
     if (!x || !y) unreadable++;
-    if (first.error !== second.error) lines.push(`- 抽取出错：${second.url}：${first.error ?? "无"} → ${second.error ?? "无"}`);
+    if (first.error !== second.error) lines.push(`- erro na extração: ${second.url}: ${first.error ?? "nenhum"} → ${second.error ?? "nenhum"}`);
     if (json(x) === json(y)) { if (first.error === second.error) unchanged++; continue; }
     const textChanged = x?.text !== y?.text;
     const media = (body: Body | null) => body && [body.images, body.captions, body.videos, body.cover];
@@ -167,17 +167,17 @@ function diff(a: string, b: string) {
     if (removedImages.length) lostImages++;
     if (removedVideos.length) lostVideos++;
     const xChars = [...(x?.text ?? "")].length, yChars = [...(y?.text ?? "")].length;
-    lines.push(`- ${first.url}`, `  - ${textChanged ? "文字变化" : mediaChanged ? "仅媒体变化" : "只变版式"}；正文字数 ${xChars} → ${yChars}（${yChars - xChars >= 0 ? "+" : ""}${yChars - xChars}）`);
-    if (!x || !y) lines.push(`  - 正文提取：${x ? "成功" : "未提取到"} → ${y ? "成功" : "未提取到"}`);
-    changes("段落", x?.paragraphs ?? [], y?.paragraphs ?? [], clip);
-    changes("图片", x?.images ?? [], y?.images ?? [], url => url);
-    changes("视频", videoSources(x), videoSources(y), url => url);
-    if (json(x?.captions) !== json(y?.captions)) changes("图注", x?.captions ?? [], y?.captions ?? [], caption => `${clip(caption.text)}${caption.media.length ? `（${caption.media.join(", ")}）` : ""}`);
-    if (json(x?.videos) !== json(y?.videos) && !removedVideos.length && !added(videoSources(x), videoSources(y)).length) lines.push("  - 视频顺序或海报变化");
-    if (json(x?.cover) !== json(y?.cover)) lines.push(`  - 封面：${json(x?.cover ?? null)} → ${json(y?.cover ?? null)}`);
+    lines.push(`- ${first.url}`, `  - ${textChanged ? "texto mudou" : mediaChanged ? "só a mídia mudou" : "só o layout mudou"}; caracteres do texto ${xChars} → ${yChars} (${yChars - xChars >= 0 ? "+" : ""}${yChars - xChars})`);
+    if (!x || !y) lines.push(`  - extração do texto: ${x ? "ok" : "não extraído"} → ${y ? "ok" : "não extraído"}`);
+    changes("parágrafo", x?.paragraphs ?? [], y?.paragraphs ?? [], clip);
+    changes("imagem", x?.images ?? [], y?.images ?? [], url => url);
+    changes("vídeo", videoSources(x), videoSources(y), url => url);
+    if (json(x?.captions) !== json(y?.captions)) changes("legenda", x?.captions ?? [], y?.captions ?? [], caption => `${clip(caption.text)}${caption.media.length ? ` (${caption.media.join(", ")})` : ""}`);
+    if (json(x?.videos) !== json(y?.videos) && !removedVideos.length && !added(videoSources(x), videoSources(y)).length) lines.push("  - ordem ou capa dos vídeos mudou");
+    if (json(x?.cover) !== json(y?.cover)) lines.push(`  - capa: ${json(x?.cover ?? null)} → ${json(y?.cover ?? null)}`);
   }
-  lines.push("", `汇总：没变 ${unchanged} 篇；只变版式 ${layout} 篇；字变了 ${words} 篇；仅媒体变化 ${mediaOnly} 篇；少了图片 ${lostImages} 篇；少了视频 ${lostVideos} 篇。`,
-    `样本：新增 ${after.filter(page => !old.has(page.id)).length} 篇；移除 ${before.filter(page => !next.has(page.id)).length} 篇；任一次未提取到正文 ${unreadable} 篇。`);
+  lines.push("", `Resumo: ${unchanged} sem mudança; ${layout} só no layout; ${words} com texto mudado; ${mediaOnly} só na mídia; ${lostImages} perderam imagens; ${lostVideos} perderam vídeos.`,
+    `Amostras: ${after.filter(page => !old.has(page.id)).length} novas; ${before.filter(page => !next.has(page.id)).length} removidas; ${unreadable} sem texto extraído em alguma das rodadas.`);
   console.log(lines.join("\n"));
 }
 

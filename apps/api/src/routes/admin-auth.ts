@@ -67,7 +67,7 @@ export function adminHandler(fn: AdminHandler) {
 
 function handlerError(req: FastifyRequest, reply: FastifyReply, error: unknown) {
   if (error instanceof ZodError) {
-    return sendProblem(req, reply, { status: 400, code: "invalid_request", detail: error.issues.map((issue) => `${issue.path.join(".") || "请求"}: ${issue.message}`).join("; ").slice(0, 300) });
+    return sendProblem(req, reply, { status: 400, code: "invalid_request", detail: error.issues.map((issue) => `${issue.path.join(".") || "requisição"}: ${issue.message}`).join("; ").slice(0, 300) });
   }
   if ((error as { statusCode?: number }).statusCode === 400 || error instanceof SyntaxError) {
     return sendProblem(req, reply, { status: 400, code: "invalid_request", detail: String((error as Error).message).slice(0, 300) });

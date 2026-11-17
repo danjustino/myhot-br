@@ -216,7 +216,7 @@ export async function syncArticleEventCopyTx(tx: Db, articleId: string): Promise
     const fallbackFactTitle = ownFactCandidate || peers[0]?.title?.slice(0, 60) || "";
     const targetFactTitle = soleActive && ownFactCandidate ? ownFactCandidate : m.fact_title;
     const rawConditions = soleActive && !suppressOriginal && Array.isArray(frame?.conditions)
-      ? frame.conditions.map((c: { text?: string }) => c.text).filter(Boolean).join("；") || null
+      ? frame.conditions.map((c: { text?: string }) => c.text).filter(Boolean).join("; ") || null
       : (suppressOriginal || withdrawn) && peers.every((p) => p.suppress_original)
         ? null
         : m.conditions;

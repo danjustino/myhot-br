@@ -335,7 +335,7 @@ export function ReasonDialog({
             </div>
           )}
           <div className="mt-5 flex justify-end gap-2">
-            <Button tone="ghost" onClick={onClose}>取消</Button>
+            <Button tone="ghost" onClick={onClose}>Cancelar</Button>
             <Button type="submit" tone={danger ? "danger" : "primary"} busy={busy} disabled={requireReason && !reason.trim()}>
               {confirmLabel}
             </Button>

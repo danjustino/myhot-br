@@ -98,7 +98,7 @@ export async function seenOnCard(reader: Reader, ownFact: number | null): Promis
 
 /**
  * The card of the author's own article telling this post's news, whatever fact the two share. Grouping
- * already putting them in one fact settles it without a comparison (反馈 2723: the comparison missed
+ * already putting them in one fact settles it without a comparison (feedback 2723: the comparison missed
  * a pair grouping had joined, and both cards went out).
  */
 export async function ownArticleOnCard(reader: Reader, ownFact: number | null): Promise<CardRow | null> {

@@ -1,7 +1,7 @@
 // Names, dates and grouping for daily, weekly and monthly reports.
 import { REPORT_NAMES, type ReportNavigationEntry, type ReportKind } from "@aihot/contracts/site";
 import { beijingDate, beijingWeekday, isoWeekLabel, isoWeekRange, monthDay as engineMonthDay } from "@aihot/contracts/time";
-import { EDITION_WHEN, REPORTS, SITE, subjectAfter } from "@aihot/site";
+import { EDITION_WHEN, REPORTS, SITE } from "@aihot/site";
 import { RELEASE } from "@aihot/industry/taxonomy";
 import { monthDay, weekdayShort } from "../../lib/format.ts";
 
