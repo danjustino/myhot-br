@@ -76,13 +76,13 @@ export const SCORE_SYSTEM = promptText("selection-score");
 export const ScoreSchema = z.object({ attentionScore: z.coerce.number().int().min(0).max(100) });
 
 const SCORE_TIME = new Intl.DateTimeFormat("sv-SE", {
-  timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
+  timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
 });
 
-/** The score input's time: Beijing time, ISO 8601 with +08:00 (the form the prompt was tuned on). */
+/** The score input's time: Beijing time, ISO 8601 with -03:00 (the form the prompt was tuned on). */
 export function scoreInputTime(at: Date): string {
   const ms = at.getTime() % 1000;
-  return `${SCORE_TIME.format(at).replace(" ", "T")}${ms ? `.${String(ms).padStart(3, "0")}` : ""}+08:00`;
+  return `${SCORE_TIME.format(at).replace(" ", "T")}${ms ? `.${String(ms).padStart(3, "0")}` : ""}-03:00`;
 }
 
 /**
@@ -92,7 +92,7 @@ export function scoreInputTime(at: Date): string {
 export function buildScoreInput(a: AnalyzeInputArticle): string {
   let body: string;
   if (a.xPost) {
-    const quoted = a.xPost.quoted?.text ? `\n\n[引用 ${a.xPost.quoted.handle ? `@${a.xPost.quoted.handle}` : "原推文"}]：${a.xPost.quoted.text}` : "";
+    const quoted = a.xPost.quoted?.text ? `\n\n[Citação de ${a.xPost.quoted.handle ? `@${a.xPost.quoted.handle}` : "post original"}]: ${a.xPost.quoted.text}` : "";
     body = `${String(a.xPost.text ?? "").trim()}${quoted}`.trim();
   } else {
     body = (a.bodyText ?? a.excerpt ?? "").trim();
@@ -100,10 +100,10 @@ export function buildScoreInput(a: AnalyzeInputArticle): string {
   if (!body) body = a.title;
   const at = a.publishedAt;
   return [
-    "请按系统规则评估以下单篇材料所代表的事件。只输出 attentionScore。",
-    `【发布时间（北京时间）】\n${at ? a.publicationTime === undefined || a.publicationTime?.includes("T") ? scoreInputTime(at) : describePublicationTime(at, a.publicationTime) : "未知（收录时间不代表发布时间）"}`,
-    `【标题】\n${a.title.trim()}`,
-    `【完整正文】\n${body.length > MAX_BODY_CHARS ? body.slice(0, MAX_BODY_CHARS) : body}`,
+    "Avalie, segundo as regras do sistema, o acontecimento representado pelo material abaixo. Responda apenas attentionScore.",
+    `[Data de publicação (horário de Brasília)]\n${at ? a.publicationTime === undefined || a.publicationTime?.includes("T") ? scoreInputTime(at) : describePublicationTime(at, a.publicationTime) : "Desconhecida (a hora de coleta não é a hora de publicação)"}`,
+    `[Título]\n${a.title.trim()}`,
+    `[Texto completo]\n${body.length > MAX_BODY_CHARS ? body.slice(0, MAX_BODY_CHARS) : body}`,
   ].join("\n\n");
 }
 
@@ -111,20 +111,20 @@ export function buildScoreInput(a: AnalyzeInputArticle): string {
 
 const PrefilterSchema = z.object({
   label: z.preprocess((v) => String(v ?? "").trim().toUpperCase(), z.enum(["PASS", "BLOCK", "UNKNOWN"])),
-  reason: z.string().max(200).catch(""),
+  reason: z.string().max(500).catch(""),
 });
 
 const FactSchema = z
   .object({
-    title: z.string().max(80),
-    subject: z.string().max(80).nullable().optional(),
-    action: z.string().max(80).nullable().optional(),
-    object: z.string().max(160).nullable().optional(),
+    title: z.string().max(200),
+    subject: z.string().max(160).nullable().optional(),
+    action: z.string().max(160).nullable().optional(),
+    object: z.string().max(320).nullable().optional(),
     occurredAt: z.string().nullable().optional(),
     evidence: z.string().trim().max(600).nullable().catch(null),
     conditions: z.array(z.object({
       // Older reusable receipts may also contain a paraphrase. New extraction only copies evidence.
-      text: z.string().trim().min(1).max(200).optional().catch(undefined),
+      text: z.string().trim().min(1).max(400).optional().catch(undefined),
       quote: z.string().trim().min(1).max(400),
     }).nullable().catch(null)).catch([]),
   })
@@ -144,23 +144,23 @@ const UnderstandSchema = z.object({
   authorRole: z.enum(["principal", "observer", "relayer"]).catch("relayer"),
   // The understanding prompt asks for tags; the public ones come from the structure step.
   tags: z.array(z.string()).max(12).catch([]),
-  editorialJudgment: z.string().max(400).catch(""),
+  editorialJudgment: z.string().max(1000).catch(""),
   titleZh: z.string().trim().min(1).max(200),
   summaryZh: z.string().trim().min(1).max(4000),
 });
 
 const SummarizeSchema = z.object({ titleZh: z.string(), summaryZh: z.string(), bodyZh: z.string() });
 
-const ZH_COUNT = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"];
+const ZH_COUNT = ["zero", "uma", "duas", "três", "quatro", "cinco", "seis", "sete", "oito", "nove", "dez", "onze", "doze"];
 
 /** The structure step owns the public category and tags, as well as grouping evidence (filled from the pack's vocabulary). */
 export const STRUCTURE_SYSTEM = promptText("structure", {
   categoryCount: ZH_COUNT[CATEGORIES.length] ?? String(CATEGORIES.length),
   categoryGuide: CATEGORY_GUIDE,
-  categoryTags: CATEGORY_TAGS.join("、"),
-  topicTags: TOPIC_TAGS.join("、"),
-  entityTags: ENTITY_TAGS.join("、"),
-  entities: Object.entries(ENTITIES).map(([id, e]) => `${id}（${e.aliases.slice(0, 3).join("/")}）`).join("，"),
+  categoryTags: CATEGORY_TAGS.join(", "),
+  topicTags: TOPIC_TAGS.join(", "),
+  entityTags: ENTITY_TAGS.join(", "),
+  entities: Object.entries(ENTITIES).map(([id, e]) => `${id} (${e.aliases.slice(0, 3).join("/")})`).join("; "),
 });
 
 /** Keep only quotes present both in the original material and in the text the structure model saw. */
@@ -391,9 +391,9 @@ async function mendWording(a: AnalyzeInputArticle, w: NonNullable<AnalysisRun["w
     res = await chatJson({
       model: await modelFor("wording"), purpose: "mend_wording", subject: subjectOf(a), promptVersion: PROMPT_VERSIONS.wording, system: MEND_SYSTEM,
       user: [
-        `来源：${t.sourceName ?? "（未注明）"}`, `原题：${t.title}`,
-        `中文稿：\n${JSON.stringify({ titleZh: w.titleZh, summaryZh: w.summaryZh, reasonZh: w.reasonZh })}`,
-        `问题：\n${problems.map((p) => `- ${p}`).join("\n")}`,
+        `Fonte: ${t.sourceName ?? "(não informada)"}`, `Título original: ${t.title}`,
+        `Texto em português:\n${JSON.stringify({ titleZh: w.titleZh, summaryZh: w.summaryZh, reasonZh: w.reasonZh })}`,
+        `Problemas:\n${problems.map((p) => `- ${p}`).join("\n")}`,
       ].join("\n\n"),
       schema: MendSchema, temperature: 0.1, maxTokens: 2048, attemptTag: tagged(opts.attemptTag, "wording"),
     });

@@ -171,8 +171,8 @@ export function siteLd() {
       "@context": "https://schema.org",
       "@type": "Dataset",
       "@id": `${base}/#dataset`,
-      name: `${SITE.name} — ${withSubject("行业动态数据集")}`,
-      description: `${subjectAfter("持续更新的中文", "行业动态")}：每条附中文摘要、评分与原文出处，${subjectAfter("另有每日精选与", "日报")}，可通过 RSS 与公开 API 获取。`,
+      name: `${SITE.name} — ${withSubject("Base de notícias de tecnologia")}`,
+      description: "Notícias de tecnologia em português, sempre atualizadas: cada item traz resumo em português, nota e link da fonte, além de destaques e resumo diário, disponíveis por RSS e API pública.",
       url: base,
       inLanguage: SITE.locale,
       isAccessibleForFree: true,
@@ -181,12 +181,12 @@ export function siteLd() {
       creator: orgRef(),
       publisher: orgRef(),
       distribution: [
-        { "@type": "DataDownload", name: "精选 RSS", encodingFormat: "application/rss+xml", contentUrl: `${base}/feed.xml` },
-        { "@type": "DataDownload", name: "全部动态 RSS", encodingFormat: "application/rss+xml", contentUrl: `${base}/feed/all.xml` },
-        { "@type": "DataDownload", name: `${withSubject("日报")} RSS`, encodingFormat: "application/rss+xml", contentUrl: `${base}/feed/daily.xml` },
-        { "@type": "DataDownload", name: `${withSubject("周报")} RSS`, encodingFormat: "application/rss+xml", contentUrl: `${base}/feed/weekly.xml` },
-        { "@type": "DataDownload", name: `${withSubject("月报")} RSS`, encodingFormat: "application/rss+xml", contentUrl: `${base}/feed/monthly.xml` },
-        { "@type": "DataDownload", name: "公开 API v1", encodingFormat: "application/json", contentUrl: `${base}/api/v1/items` },
+        { "@type": "DataDownload", name: "RSS dos destaques", encodingFormat: "application/rss+xml", contentUrl: `${base}/feed.xml` },
+        { "@type": "DataDownload", name: "RSS de todas as notícias", encodingFormat: "application/rss+xml", contentUrl: `${base}/feed/all.xml` },
+        { "@type": "DataDownload", name: `RSS do ${withSubject("resumo diário")}`, encodingFormat: "application/rss+xml", contentUrl: `${base}/feed/daily.xml` },
+        { "@type": "DataDownload", name: `RSS do ${withSubject("resumo semanal")}`, encodingFormat: "application/rss+xml", contentUrl: `${base}/feed/weekly.xml` },
+        { "@type": "DataDownload", name: `RSS do ${withSubject("resumo mensal")}`, encodingFormat: "application/rss+xml", contentUrl: `${base}/feed/monthly.xml` },
+        { "@type": "DataDownload", name: "API pública v1", encodingFormat: "application/json", contentUrl: `${base}/api/v1/items` },
         { "@type": "DataDownload", name: "OpenAPI", encodingFormat: "application/json", contentUrl: `${base}/openapi-v1.json` },
       ],
     },
@@ -255,8 +255,8 @@ export function reportTitle(report: ReportDetail): string {
   // highlights were filled with are not its news.
   const entries = new Set(report.sections.flatMap((s) => s.items.map((i) => i.itemId)));
   const lead = report.lead?.title.trim() || report.highlights.find((item) => item.available && entries.has(item.itemId))?.title.trim();
-  const name = `${withSubject(REPORT_NAMES[report.kind])}｜${reportDateLabel(report.kind, report.key)}`;
-  return lead ? `${name}：${lead}` : name;
+  const name = `${withSubject(REPORT_NAMES[report.kind])} | ${reportDateLabel(report.kind, report.key)}`;
+  return lead ? `${name}: ${lead}` : name;
 }
 
 /**
@@ -274,13 +274,13 @@ export function reportDescription(r: ReportDetail): string | null {
       let text = titles[0]!;
       for (const t of titles.slice(1)) {
         if (text.length + t.length > 120) break;
-        text += `；${t}`;
+        text += `; ${t}`;
       }
-      return `${date} ${withSubject("新闻")}：${text}${/[。！？!?]$/.test(text) ? "" : "。"}`;
+      return `${date} ${withSubject("Notícias")}: ${text}${/[。！？!?.]$/.test(text) ? "" : "."}`;
     }
   }
   const lead = r.lead?.leadParagraph ?? r.overview?.slice(0, 150);
-  return lead ? `${date} ${withSubject("资讯")}：${lead}` : null;
+  return lead ? `${date} ${withSubject("Notícias")}: ${lead}` : null;
 }
 
 /** One report issue: an editorial round-up by the site (no personal byline), sections as its sections. */
@@ -317,7 +317,7 @@ export function storyLd(story: StoryDetail) {
     ...(reports.length ? {
       mainEntity: {
         "@type": "ItemList",
-        name: "报道时间线",
+        name: "Linha do tempo das matérias",
         itemListOrder: "https://schema.org/ItemListOrderDescending",
         numberOfItems: reports.length,
         itemListElement: reports.map((report, index) => ({ "@type": "ListItem", position: index + 1, name: report.title })),

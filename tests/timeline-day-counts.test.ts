@@ -20,7 +20,7 @@ const descending = (anchors: number[]) => anchors.sort((a, b) => b - a).map(anch
 test("day counts retain exact Beijing midnight, leap-day and year boundaries", () => {
   assert.deepEqual(countTimelineDays([], new Set()), {});
   // UTC inputs and calendar answers are independent of the production timezone helpers.
-  const anchors = ["2023-12-30T16:00:00Z", "2023-12-31T16:00:00Z", "2024-02-28T16:00:00Z", "2024-02-29T16:00:00Z"].flatMap(time => {
+  const anchors = ["2023-12-31T03:00:00Z", "2024-01-01T03:00:00Z", "2024-02-29T03:00:00Z", "2024-03-01T03:00:00Z"].flatMap(time => {
     const midnight = Date.parse(time);
     return [midnight - 1, midnight, midnight, midnight + 1];
   });
@@ -32,24 +32,24 @@ test("day counts retain exact Beijing midnight, leap-day and year boundaries", (
 });
 
 test("day headers name the year only for a day outside today's year", () => {
-  assert.equal(monthDay("2026-10-05", "2026-10-19"), "10月5日");
-  assert.equal(monthDay("2019-02-19", "2026-10-19"), "2019年2月19日");
-  assert.equal(monthDay("2025-12-31", "2026-01-01"), "2025年12月31日");
-  assert.equal(monthDay("2019-02-19"), "2月19日");
-  // The pages' dates (a story's report days, a topic's "更新" line, "月日 时:分") do the same, by Beijing's year.
-  const october = Date.parse("2026-10-05T09:00:00+08:00");
-  assert.equal(pageMonthDay("2026-10-05", october), "10月5日");
-  assert.equal(pageMonthDay("2026-01-01", october), "1月1日");
-  assert.equal(pageMonthDay("2019-02-19", october), "2019年2月19日");
-  // The year turns at Beijing midnight: not yet at 23:30 on 31 December, and 00:30 on 1 January is still 31 December in UTC.
-  const lastHalfHour = Date.parse("2026-12-31T23:30:00+08:00");
-  assert.equal(pageMonthDay("2026-12-31", lastHalfHour), "12月31日");
-  assert.equal(pageMonthDay("2027-01-01", lastHalfHour), "2027年1月1日");
-  const firstHalfHour = Date.parse("2027-01-01T00:30:00+08:00");
-  assert.equal(new Date(firstHalfHour).getUTCFullYear(), 2026);
-  assert.equal(pageMonthDay("2026-12-31", firstHalfHour), "2026年12月31日");
-  assert.equal(pageMonthDay("2027-01-01", firstHalfHour), "1月1日");
-  assert.equal(monthDayTime("2019-02-19T04:00:00.000Z"), "2019年2月19日 12:00");
+  assert.equal(monthDay("2026-10-05", "2026-10-19"), "5 out");
+  assert.equal(monthDay("2019-02-19", "2026-10-19"), "19 fev 2019");
+  assert.equal(monthDay("2025-12-31", "2026-01-01"), "31 dez 2025");
+  assert.equal(monthDay("2019-02-19"), "19 fev");
+  // The pages' dates (a story's report days, a topic's "Atualizado" line, "dia mês hora:min") do the same, by the site's year.
+  const october = Date.parse("2026-10-05T09:00:00-03:00");
+  assert.equal(pageMonthDay("2026-10-05", october), "5 out");
+  assert.equal(pageMonthDay("2026-01-01", october), "1 jan");
+  assert.equal(pageMonthDay("2019-02-19", october), "19 fev 2019");
+  // The year turns at Brasília midnight: 23:30 on 31 December is already 1 January in UTC, and still this year here.
+  const lastHalfHour = Date.parse("2026-12-31T23:30:00-03:00");
+  assert.equal(new Date(lastHalfHour).getUTCFullYear(), 2027);
+  assert.equal(pageMonthDay("2026-12-31", lastHalfHour), "31 dez");
+  assert.equal(pageMonthDay("2027-01-01", lastHalfHour), "1 jan 2027");
+  const firstHalfHour = Date.parse("2027-01-01T00:30:00-03:00");
+  assert.equal(pageMonthDay("2026-12-31", firstHalfHour), "31 dez 2026");
+  assert.equal(pageMonthDay("2027-01-01", firstHalfHour), "1 jan");
+  assert.equal(monthDayTime("2019-02-19T04:00:00.000Z"), "19 fev 2019 01:00");
 });
 
 test("deterministic varied timelines match the full-scan reference", () => {

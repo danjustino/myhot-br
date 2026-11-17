@@ -78,11 +78,11 @@ test("source tier and event ownership are separate; mentions of an entity do not
   }
   assert.equal(representativePriority({ ...org, fact_subject: "ChatGPT" }), 1, "exact configured product alias");
   assert.equal(representativePriority({ ...org, fact_subject: "OpenAI / Anthropic" }), 1, "explicit co-subject list");
-  assert.equal(representativePriority({ ...org, owner_entity_id: "qwen", fact_subject: "Qwen Team" }), 1, "the company under another of its own names");
-  assert.equal(representativePriority({ ...org, owner_entity_id: "world-labs", fact_subject: "AMD + World Labs" }), 1);
-  assert.equal(representativePriority({ ...org, owner_entity_id: "xai", fact_subject: "SpaceXSI" }), 1, "xAI after its rename to SpaceX Super Intelligence");
-  assert.equal(representativePriority({ ...org, owner_entity_id: "xai", fact_subject: "Grok Bot" }), 1, "xAI's agent product");
-  assert.equal(representativePriority({ ...org, owner_entity_id: "meta", fact_subject: "Muse" }), 1, "Meta's agent product");
+  assert.equal(representativePriority({ ...org, owner_entity_id: "samsung", fact_subject: "Samsung Electronics" }), 1, "the company under another of its own names");
+  assert.equal(representativePriority({ ...org, owner_entity_id: "amd", fact_subject: "AMD + Intel" }), 1);
+  assert.equal(representativePriority({ ...org, owner_entity_id: "motorola", fact_subject: "Lenovo" }), 1, "Motorola under its parent company's name");
+  assert.equal(representativePriority({ ...org, owner_entity_id: "microsoft", fact_subject: "Copilot" }), 1, "Microsoft's assistant product");
+  assert.equal(representativePriority({ ...org, owner_entity_id: "meta", fact_subject: "WhatsApp" }), 1, "Meta's messaging product");
   assert.equal(representativePriority({ ...org, fact_subject: "OpenAI + " }), 3, "incomplete subject list is not evidence");
   assert.equal(representativePriority({ ...org, owner_entity_id: null }), 3);
   assert.equal(representativePriority({ ...org, owner_entity_id: "unregistered-org", fact_subject: "unregistered-org" }), 3, "equal unknown strings are not verified identity");
@@ -405,7 +405,7 @@ test("an editor moves a report into the fact it repeats: no false development re
   assert.deepEqual([...await sql`SELECT fact_id, role, manual, evidence FROM fact_articles WHERE article_id=${repost}`].map(r => ({ ...r, fact_id: Number(r.fact_id) })),
     [{ fact_id: g.factId, role: "report", manual: true, evidence: "Tasks consume usage." }]);
   assert.equal((await sql`SELECT 1 FROM story_signals WHERE article_id=${repost} AND story_id=${g.storyId}`).length, 1, "its heat evidence stays with the story");
-  await assert.rejects(moveToFact(repost, "f-missing", "x", "test"), /目标事实不存在/);
+  await assert.rejects(moveToFact(repost, "f-missing", "x", "test"), /O fato de destino não existe/);
 });
 
 test("an in-flight digest cannot overwrite an editor revision or a merge, and its paid response remains reusable", async () => {

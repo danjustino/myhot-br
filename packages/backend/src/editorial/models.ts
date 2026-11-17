@@ -22,19 +22,19 @@ export interface Capability {
 }
 
 export const CAPABILITIES = {
-  prefilter: { label: "精选预筛（是否属于这个行业，宽召回）", env: "PREFILTER_MODEL", default: DEFAULTS.prefilter ?? "default", purposes: ["prefilter_article"] },
-  score: { label: "精选评分（两次独立评分，按信源分级与类别的门槛）", env: "SCORE_MODEL", default: DEFAULTS.score ?? "default", purposes: ["score_article"] },
-  understand: { label: "内容理解（入选和接近入选的标题、摘要、推荐理由，能看图时看首图）", env: "UNDERSTAND_MODEL", default: DEFAULTS.understand ?? "default", purposes: ["understand_article"] },
-  summarize: { label: "标题摘要（其余文章的中文标题与摘要）", env: "SUMMARIZE_MODEL", default: DEFAULTS.summarize ?? "default", purposes: ["summarize_article"] },
-  wording: { label: "改用词（标题、摘要、理由用了本站不用的词时，只改这些词）", env: "WORDING_MODEL", default: DEFAULTS.wording ?? "default", purposes: ["mend_wording"], idle: () => !READER_WORDING.length },
-  structure: { label: "结构抽取（分类、标签、主体公司、事件事实，不写读者文字）", env: "STRUCTURE_MODEL", default: DEFAULTS.structure ?? "default", purposes: ["structure_article"] },
-  group: { label: "事件归组（新报道与候选事实的关系：同一次发生、同一事件的进展、无关；被同一篇报道连起来的两个事件是否同一事件）", env: "GROUP_MODEL", default: DEFAULTS.group ?? "default", purposes: ["group_article", "group_signal", "group_story", "group_card"] },
-  groupReview: { label: "归组复核（相似度不高的合并、两个事件的合并，写入前再读一遍；最好换一家模型）", env: "GROUP_REVIEW_MODEL", default: DEFAULTS.groupReview ?? "default", purposes: ["group_review", "group_story_review", "group_card_review"] },
-  digest: { label: "事件综述", env: "DIGEST_MODEL", default: DEFAULTS.digest ?? "default", purposes: ["story_digest"] },
+  prefilter: { label: "Pré-triagem (se pertence a este nicho, recall amplo)", env: "PREFILTER_MODEL", default: DEFAULTS.prefilter ?? "default", purposes: ["prefilter_article"] },
+  score: { label: "Pontuação de seleção (duas notas independentes, com limite por nível de fonte e categoria)", env: "SCORE_MODEL", default: DEFAULTS.score ?? "default", purposes: ["score_article"] },
+  understand: { label: "Compreensão do conteúdo (título, resumo e motivo para os selecionados e quase selecionados; vê a primeira imagem quando pode)", env: "UNDERSTAND_MODEL", default: DEFAULTS.understand ?? "default", purposes: ["understand_article"] },
+  summarize: { label: "Título e resumo (título e resumo em português dos demais artigos)", env: "SUMMARIZE_MODEL", default: DEFAULTS.summarize ?? "default", purposes: ["summarize_article"] },
+  wording: { label: "Ajuste de vocabulário (quando título, resumo ou motivo usam palavras que o site evita, troca só essas palavras)", env: "WORDING_MODEL", default: DEFAULTS.wording ?? "default", purposes: ["mend_wording"], idle: () => !READER_WORDING.length },
+  structure: { label: "Extração de estrutura (categoria, tags, empresa principal, fatos do evento; não escreve texto para o leitor)", env: "STRUCTURE_MODEL", default: DEFAULTS.structure ?? "default", purposes: ["structure_article"] },
+  group: { label: "Agrupamento de eventos (relação entre a nova matéria e os fatos candidatos: mesmo acontecimento, desdobramento do mesmo evento, sem relação; se dois eventos ligados pela mesma matéria são o mesmo evento)", env: "GROUP_MODEL", default: DEFAULTS.group ?? "default", purposes: ["group_article", "group_signal", "group_story", "group_card"] },
+  groupReview: { label: "Revisão do agrupamento (relê fusões de baixa similaridade e fusões de dois eventos antes de gravar; de preferência outro provedor)", env: "GROUP_REVIEW_MODEL", default: DEFAULTS.groupReview ?? "default", purposes: ["group_review", "group_story_review", "group_card_review"] },
+  digest: { label: "Resumo do evento", env: "DIGEST_MODEL", default: DEFAULTS.digest ?? "default", purposes: ["story_digest"] },
   // Dailies are computed by rule; report_lead and report_daily remain for their older receipts.
-  report: { label: "周报月报的总述与主题（日报由规则算出，不用模型）", env: "REPORT_MODEL", default: DEFAULTS.report ?? "default", purposes: ["report_weekly", "report_monthly", "report_lead", "report_daily"] },
-  translate: { label: "精选全文翻译（含引用帖）", env: "TRANSLATE_MODEL", default: DEFAULTS.translate ?? "default", purposes: ["translate_body", "translate_quoted"] },
-  feedback: { label: "反馈筛选（读者反馈有没有内容，没有内容的不转发）", env: "FEEDBACK_MODEL", default: DEFAULTS.feedback ?? "default", purposes: ["judge_feedback"] },
+  report: { label: "Abertura e seções do semanal e do mensal (o diário é montado por regra, sem modelo)", env: "REPORT_MODEL", default: DEFAULTS.report ?? "default", purposes: ["report_weekly", "report_monthly", "report_lead", "report_daily"] },
+  translate: { label: "Tradução do texto completo dos selecionados (inclui posts citados)", env: "TRANSLATE_MODEL", default: DEFAULTS.translate ?? "default", purposes: ["translate_body", "translate_quoted"] },
+  feedback: { label: "Triagem de feedback (se o feedback do leitor tem conteúdo; os vazios não são encaminhados)", env: "FEEDBACK_MODEL", default: DEFAULTS.feedback ?? "default", purposes: ["judge_feedback"] },
 } satisfies Record<string, Capability>;
 
 export type CapabilityKey = keyof typeof CAPABILITIES;
@@ -58,7 +58,7 @@ export async function stepsOnService(service: string, models?: ReadonlySet<strin
         return model && model.service === service && (!models || models.has(model.model));
       });
     })
-    .map(([, c]) => c.label.split("（")[0]!);
+    .map(([, c]) => c.label.split(" (")[0]!);
   return [...new Set(steps)];
 }
 

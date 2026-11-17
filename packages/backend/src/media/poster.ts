@@ -23,11 +23,11 @@ const INK = "#0e191b";
 const ACCENT = "#176b75";
 
 async function tree(p: Poster): Promise<Node> {
-  const title = clamp(p.title, 72);
+  const title = clamp(p.title, 130);
   const len = [...title].length;
-  const titleSize = len > 48 ? 58 : len > 30 ? 66 : 76;
+  const titleSize = len > 86 ? 58 : len > 54 ? 66 : 76;
   // The summary takes the room the title leaves.
-  const summary = p.summary ? clamp(p.summary, len > 48 ? 120 : len > 30 ? 150 : 180) : null;
+  const summary = p.summary ? clamp(p.summary, len > 86 ? 216 : len > 54 ? 270 : 324) : null;
   const qr = `data:image/svg+xml;base64,${Buffer.from(renderSVG(p.url, { border: 0, ecc: "M", blackColor: INK, whiteColor: "#ffffff" })).toString("base64")}`;
   return h(
     "div",
@@ -49,14 +49,14 @@ async function tree(p: Poster): Promise<Node> {
       ]),
       h("div", { display: "flex", alignItems: "center", marginTop: 96 }, [
         h("div", { width: 12, height: 12, borderRadius: 999, backgroundColor: ACCENT, marginRight: 16 }),
-        h("div", { display: "flex", fontSize: 30, fontWeight: 700, color: ACCENT, letterSpacing: 1 }, clamp(p.kicker, 20)),
+        h("div", { display: "flex", fontSize: 30, fontWeight: 700, color: ACCENT, letterSpacing: 1 }, clamp(p.kicker, 36)),
         p.score !== null
-          ? h("div", { display: "flex", marginLeft: 20, padding: "4px 16px", borderRadius: 999, backgroundColor: "rgba(23,107,117,0.09)", fontSize: 26, color: "#0f5a63" }, `精选 · ${Math.round(p.score)} 分`)
+          ? h("div", { display: "flex", marginLeft: 20, padding: "4px 16px", borderRadius: 999, backgroundColor: "rgba(23,107,117,0.09)", fontSize: 26, color: "#0f5a63" }, `Seleção · ${Math.round(p.score)} pts`)
           : null,
       ].filter(Boolean)),
       h("div", { display: "flex", marginTop: 30, fontSize: titleSize, fontWeight: 700, lineHeight: 1.3, color: INK }, title),
       summary ? h("div", { display: "flex", marginTop: 36, fontSize: 34, lineHeight: 1.7, color: "#3a484c" }, summary) : null,
-      h("div", { display: "flex", marginTop: 36, fontSize: 28, color: "#66757a" }, clamp(`来源：${p.source}`, 34)),
+      h("div", { display: "flex", marginTop: 36, fontSize: 28, color: "#66757a" }, clamp(`Fonte: ${p.source}`, 60)),
       h("div", { display: "flex", flex: 1 }),
       h(
         "div",
@@ -64,8 +64,8 @@ async function tree(p: Poster): Promise<Node> {
         [
           h("img", { width: 200, height: 200 }, undefined, { src: qr, width: 200, height: 200 }),
           h("div", { display: "flex", flexDirection: "column", marginLeft: 44, flex: 1 }, [
-            h("div", { display: "flex", fontSize: 36, fontWeight: 700, color: INK }, "长按识别二维码"),
-            h("div", { display: "flex", marginTop: 14, fontSize: 28, lineHeight: 1.5, color: "#66757a" }, "阅读全文、中文译文与原文链接"),
+            h("div", { display: "flex", fontSize: 36, fontWeight: 700, color: INK }, "Escaneie o QR code"),
+            h("div", { display: "flex", marginTop: 14, fontSize: 28, lineHeight: 1.5, color: "#66757a" }, "Texto completo, tradução e link do original"),
             h("div", { display: "flex", marginTop: 22, fontSize: 26, color: ACCENT }, SITE_HOST),
           ]),
         ],

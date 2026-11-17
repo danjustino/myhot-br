@@ -172,13 +172,13 @@ function periodOverview(content: Record<string, any>, kind: "weekly" | "monthly"
   if (!changed && typeof content.overview === "string" && content.overview) return content.overview;
   const shown = leadCandidates(content, "periodic").filter((e) => !e.itemId || !gone.has(String(e.itemId)));
   if (!shown.length) return null;
-  return `${kind === "weekly" ? "本周" : "本月"} ${shown.length} ${REPORTS.entry.measure}${REPORTS.entry.noun}，最受关注的是：${shown.slice(0, 3).map((e) => e.title).join("；")}。`;
+  return `${kind === "weekly" ? "Nesta semana" : "Neste mês"}, ${shown.length} ${REPORTS.entry.measure}${REPORTS.entry.noun}; as que mais chamaram atenção: ${shown.slice(0, 3).map((e) => e.title).join("; ")}.`;
 }
 
 /** A weekly or monthly's own headline; the composer's "<site name> 周报 · 2026-W38" names the issue, not its news. */
 function periodicHeadline(content: Record<string, any>): string | null {
   const text = String(content.headline ?? content.title ?? "");
-  const issueName = text.startsWith(`${SITE.name} `) && /^[周月]报 · /.test(text.slice(SITE.name.length + 1));
+  const issueName = text.startsWith(`${SITE.name} `) && /^(Semanal|Mensal) · /.test(text.slice(SITE.name.length + 1));
   return text && !issueName ? text : null;
 }
 
@@ -320,7 +320,7 @@ async function leadCover(itemId: string): Promise<{ url: string; srcSet?: string
 }
 
 function readingMinutes(text: string): number {
-  return Math.max(1, Math.round([...text].length / 450));
+  return Math.max(1, Math.round([...text].length / 1000));
 }
 
 async function neighbors(kind: ReportKind, key: string): Promise<{ prev: string | null; next: string | null }> {
@@ -389,8 +389,8 @@ export async function loadReport(kind: ReportKind, key: string): Promise<ReportD
     ? (named ? { title: named.title, leadParagraph: (kind === "daily" ? named.leadParagraph : overview) ?? "" } : null)
     : kind === "daily" ? c.lead ?? null
       : c.lead ? { ...c.lead, leadParagraph: overview ?? "" } : (headline ? { title: headline, leadParagraph: overview ?? "" } : null);
-  const title = kind === "daily" ? `${withSubject("日报")} · ${key}`
-    : String((hasCitedLead && c.title === headline ? named?.title : c.title) ?? (kind === "weekly" ? `${SITE.name} 周报 · ${key}` : `${SITE.name} 月报 · ${key}`));
+  const title = kind === "daily" ? `${withSubject("Resumo diário")} · ${key}`
+    : String((hasCitedLead && c.title === headline ? named?.title : c.title) ?? (kind === "weekly" ? `${SITE.name} Semanal · ${key}` : `${SITE.name} Mensal · ${key}`));
   return {
     kind,
     key,

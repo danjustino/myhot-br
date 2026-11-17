@@ -96,15 +96,15 @@ export const SignalSchema = z.object({
 export function describeReport(r: ReportView, label: string, extra = "", summaryLimit = 360): string {
   const f = r.frame;
   return [
-    `【${label}】${extra}`,
-    `标题：${r.title}`,
-    `来源：${r.source}${r.firstParty ? "（当事方/官方）" : ""}｜发布时间：${describePublicationTime(r.at, r.publicationTime)}`,
-    `摘要：${(r.summary ?? "").slice(0, summaryLimit) || "（无）"}`,
-    r.scope && r.scope !== "unknown" ? `资料范围：${r.scope === "composite" ? "多个独立发生的综合稿" : "单一具体发生或议题"}` : null,
+    `[${label}] ${extra}`,
+    `Título: ${r.title}`,
+    `Fonte: ${r.source}${r.firstParty ? " (parte envolvida/oficial)" : ""} | Publicado em: ${describePublicationTime(r.at, r.publicationTime)}`,
+    `Resumo: ${(r.summary ?? "").slice(0, summaryLimit) || "(nenhum)"}`,
+    r.scope && r.scope !== "unknown" ? `Escopo do material: ${r.scope === "composite" ? "compilado de vários acontecimentos independentes" : "um único acontecimento ou tema"}` : null,
     f && (f.subject || f.action || f.object)
-      ? `事实要素：主体=${f.subject || "?"}；动作=${f.action || "?"}；对象=${f.object || "?"}；日期=${f.occurredAt || "未知"}`
+      ? `Elementos do fato: sujeito=${f.subject || "?"}; ação=${f.action || "?"}; objeto=${f.object || "?"}; data=${f.occurredAt || "desconhecida"}`
       : null,
-    r.sourceText ? `【原文证据】\n${r.sourceText.slice(0, GROUP_BODY_CHARS)}\n【原文证据结束】` : null,
+    r.sourceText ? `[Evidência do original]\n${r.sourceText.slice(0, GROUP_BODY_CHARS)}\n[Fim da evidência do original]` : null,
   ]
     .filter(Boolean)
     .join("\n");
@@ -112,24 +112,24 @@ export function describeReport(r: ReportView, label: string, extra = "", summary
 
 export const candidateKey = (index: number) => `C${index + 1}`;
 
-export function batchUser(query: ReportView, cands: CandidateView[], queryLabel = "新报道", reading: ReadingContext[] = []): string {
+export function batchUser(query: ReportView, cands: CandidateView[], queryLabel = "Nova matéria", reading: ReadingContext[] = []): string {
   const list = cands
     .map((c, i) => [
-      describeReport(c.report, `候选 ${candidateKey(i)}`, `（该事实已有 ${c.members} 篇报道；事实标题：${c.factTitle}）`),
-      queryLabel === "新报道" ? c.selected && c.selectedReport
-        ? describeReport(c.selectedReport, "已公开精选", "（增量只与这篇已展示的内容比较）")
-        : "【尚无公开精选】该候选只用于身份判断。" : null,
+      describeReport(c.report, `Candidato ${candidateKey(i)}`, `(este fato já tem ${c.members} matéria(s); título do fato: ${c.factTitle})`),
+      queryLabel === "Nova matéria" ? c.selected && c.selectedReport
+        ? describeReport(c.selectedReport, "Já publicada na seleção", "(compare o ganho apenas com este conteúdo já exibido)")
+        : "[Ainda sem seleção publicada] Este candidato serve só para julgar identidade." : null,
     ].filter(Boolean).join("\n"))
     .join("\n\n");
   const background = reading.map(({ report, sourceText }, i) => [
-    describeReport(report, `已公开精选阅读背景 R${i + 1}`, "（只比较信息覆盖，不是事实候选）", 2000),
-    sourceText ? `【该已选报道的原文证据】\n${sourceText.slice(0, GROUP_BODY_CHARS)}\n【原文证据结束】` : null,
+    describeReport(report, `Contexto de leitura já publicado R${i + 1}`, "(compare só a cobertura de informação; não é candidato a fato)", 2000),
+    sourceText ? `[Evidência do original desta matéria selecionada]\n${sourceText.slice(0, GROUP_BODY_CHARS)}\n[Fim da evidência do original]` : null,
   ].filter(Boolean).join("\n")).join("\n\n");
-  return `${describeReport(query, queryLabel)}\n\n${list}${background ? `\n\n${background}` : ""}\n\n${queryLabel}与每个候选的关系是什么？${background ? "同时比较所有已公开精选内容，判断新增价值；无事实候选时 decisions=[]。" : ""}`;
+  return `${describeReport(query, queryLabel)}\n\n${list}${background ? `\n\n${background}` : ""}\n\nQual a relação de "${queryLabel}" com cada candidato?${background ? " Compare também com todo o conteúdo já publicado na seleção para julgar o valor novo; sem candidatos a fato, decisions=[]." : ""}`;
 }
 
 export function pairUser(a: ReportView, b: ReportView): string {
-  return `${describeReport(a, "报道 A")}\n\n${describeReport(b, "报道 B")}\n\n这两篇报道是什么关系？`;
+  return `${describeReport(a, "Matéria A")}\n\n${describeReport(b, "Matéria B")}\n\nQual a relação entre estas duas matérias?`;
 }
 
 /** An identity answer must address every supplied candidate exactly once. */
@@ -193,7 +193,7 @@ export const STORY_REVIEW_MIN_CONFIDENCE = 0.75;
 
 /** The text a report is embedded with: title and the start of the summary, the same on both sides of a comparison. */
 export function reportText(title: string, summary: string | null | undefined): string {
-  return `${title}。${(summary ?? "").slice(0, 300)}`;
+  return `${title}. ${(summary ?? "").slice(0, 300)}`;
 }
 
 /** The text a discussion post is embedded with: its title and the start of its body. */

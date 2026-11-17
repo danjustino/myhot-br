@@ -84,12 +84,12 @@ test("one alert when the worker stops, none while it stays stopped, one recovery
   await checkWorkerHeartbeat();
   await checkWorkerHeartbeat();
   assert.equal(attempts.length, 1);
-  assert.match(attempts[0]!, /后台处理服务停了/);
+  assert.match(attempts[0]!, /O serviço de processamento parou/);
   await heartbeat(false);
   await checkWorkerHeartbeat();
   await checkWorkerHeartbeat();
   assert.equal(attempts.length, 2);
-  assert.match(attempts[1]!, /已恢复/);
+  assert.match(attempts[1]!, /Resolvido/);
 });
 
 test("a failed send is tried again at the next check", async () => {
@@ -100,7 +100,7 @@ test("a failed send is tried again at the next check", async () => {
   await checkWorkerHeartbeat();
   await checkWorkerHeartbeat();
   assert.equal(attempts.length, 2, "the failed alert goes out at the next check, and only then");
-  assert.ok(attempts.every((text) => text.includes("后台处理服务停了")));
+  assert.ok(attempts.every((text) => text.includes("O serviço de processamento parou")));
 });
 
 test("with an alert webhook, alerts go to the group bot alone and need no message app", async () => {
@@ -114,7 +114,7 @@ test("with an alert webhook, alerts go to the group bot alone and need no messag
   await checkWorkerHeartbeat();
   assert.equal(attempts.length, 0, "nothing goes through the message app");
   assert.equal(hooked.length, 2, "a refused webhook send is tried again at the next check");
-  assert.ok(hooked.every((text) => text.includes("后台处理服务停了")));
+  assert.ok(hooked.every((text) => text.includes("O serviço de processamento parou")));
 });
 
 test("the alert webhook keeps within the custom bot's limits: 20 KB a request, 100 requests a minute", async () => {
@@ -125,7 +125,7 @@ test("the alert webhook keeps within the custom bot's limits: 20 KB a request, 1
   await sendAlert("系统日报", lines);
   assert.ok(hooked.length >= 3);
   assert.ok(hookedBytes.every((n) => n <= 20 * 1024), `request sizes ${hookedBytes.join(", ")}`);
-  assert.match(hooked.join(""), /^(【[^】]+】)?系统日报\n/);
+  assert.match(hooked.join(""), /^(\[[^\]]+\] )?系统日报\n/);
   assert.ok(hooked.join("").endsWith(`系统日报\n${lines.join("\n")}`), "the pieces are the whole text, in order");
   for (let i = 1; i < hookedAt.length; i++) assert.ok(hookedAt[i]! - hookedAt[i - 1]! >= 600, `at most 100 a minute: gaps ${gaps()}`);
 });

@@ -50,16 +50,16 @@ test("stripTags decodes character references, also when a feed escaped them twic
   assert.equal(stripTags("?a=1&copy=2 &unknown; AT&T"), "?a=1&copy=2 &unknown; AT&T");
 });
 
-test("writing and public reading agree about Chinese, including Japanese with kanji", () => {
-  for (const body_text of ["新しい人工知能モデルを公開しました。", "人工知能 모델을 공개했습니다."]) {
+test("writing and public reading agree about Portuguese, and not Spanish or English", () => {
+  for (const body_text of ["La nueva consola de Sony llega a México y es más barata que el modelo anterior.", "The new Sony console is coming to Brazil and is cheaper than the last model."]) {
     assert.equal(looksZh(body_text), false);
-    for (const language of [null, "ja", "ko"]) {
+    for (const language of [null, "es", "en"]) {
       assert.equal(isChineseBody({ language, body_text }), false);
-      assert.equal(exportTranslation({ language, body_text, tr_html: "<p>发布了新模型。</p>", tr_complete: true }), "<p>发布了新模型。</p>");
+      assert.equal(exportTranslation({ language, body_text, tr_html: "<p>Novo console lançado.</p>", tr_complete: true }), "<p>Novo console lançado.</p>");
     }
   }
-  assert.equal(isChineseBody({ language: "ja", body_text: "人工知能研究開発" }), false);
-  assert.equal(isChineseBody({ language: null, body_text: "新的人工智能模型发布了。" }), true);
-  assert.equal(isChineseBody({ language: "zh-Hans", body_text: "API" }), true);
-  assert.equal(isChineseBody({ language: "en", body_text: "An English article quoting 人工智能." }), false);
+  assert.equal(looksZh("Samsung anuncia Galaxy A57 com câmera de 50 MP e preço de R$ 2.499 no Brasil"), true);
+  assert.equal(isChineseBody({ language: null, body_text: "A Apple lançou o novo iPhone, que chega ao Brasil em outubro com preço mais alto." }), true);
+  assert.equal(isChineseBody({ language: "pt-BR", body_text: "API" }), true);
+  assert.equal(isChineseBody({ language: "en", body_text: "An English article quoting não é com você." }), false);
 });

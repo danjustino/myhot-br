@@ -4,12 +4,27 @@ export function collapseWhitespace(s: string): string {
   return s.replace(/\s+/g, " ").trim();
 }
 
-/** A declared language wins; otherwise Han text is Chinese only without Japanese or Korean script. */
-export function isChineseText(text: string, language?: string | null): boolean {
+// Function words common in one language and rare in the others; enough to tell Portuguese from English and Spanish.
+const PT_WORDS = new Set("não é com em um uns uma umas os para novo nova novos novas do da dos das no na nos nas ao aos à às pelo pela pelos pelas também são está estão você isso essa esse seu sua foi mais muito já então até após sobre entre agora".split(" "));
+const ES_WORDS = new Set("el los las del una y es está pero muy más también usted sus fue sobre hasta ahora".split(" "));
+const EN_WORDS = new Set("the and of to in is are was for with on that this it as by from be have has will its their".split(" "));
+
+/**
+ * Whether the text is already in the site's language (Portuguese), so it needs no translation.
+ * A declared language wins; otherwise Portuguese function words must outnumber English and Spanish ones.
+ */
+export function isTargetLanguage(text: string, language?: string | null): boolean {
   const declared = language?.toLowerCase().split(/[-_]/)[0];
-  if (declared === "zh") return true;
+  if (declared === "pt") return true;
   if (declared && !["und", "unknown", "other", "zxx"].includes(declared)) return false;
-  return /\p{Script=Han}/u.test(text) && !/[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(text);
+  let pt = 0, es = 0, en = 0;
+  for (const w of text.toLowerCase().match(/\p{L}+/gu) ?? []) {
+    if (PT_WORDS.has(w)) pt++;
+    if (ES_WORDS.has(w)) es++;
+    if (EN_WORDS.has(w)) en++;
+  }
+  pt += Math.min(3, (text.match(/[ãõç]/giu) ?? []).length); // ã, õ and ç are Portuguese; Spanish has none of them
+  return pt >= 2 && pt > en && pt > es;
 }
 
 export function truncate(s: string, max: number, ellipsis = "…"): string {

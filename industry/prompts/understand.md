@@ -8,4 +8,4 @@
 
 {{> rules-answer-first-summary}}
 
-最终只返回 itemType、authorRole、tags、editorialJudgment、titleZh、summaryZh 六个字段。答案前置只描述 summaryZh 的写法，不要增加 answer 字段。
+No final, devolva só os seis campos itemType, authorRole, tags, editorialJudgment, titleZh, summaryZh. A regra de resposta primeiro só descreve como escrever o summaryZh; não acrescente um campo answer.

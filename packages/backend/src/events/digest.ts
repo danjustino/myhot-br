@@ -14,7 +14,7 @@ export const DIGEST_PROMPT_VERSION = promptVersion("story-digest");
 export const DIGEST_SYSTEM = promptText("story-digest");
 
 export const DigestSchema = z.object({
-  title: z.string().max(120).catch(""),
+  title: z.string().max(240).catch(""),
   digest: z.string().min(10).max(2000),
 });
 
@@ -30,10 +30,10 @@ export const byReportTime = (a: { at: Date }, b: { at: Date }) => a.at.getTime()
  */
 export function buildStoryDigestInput(story: { title: string; digest: string | null }, reports: Omit<DigestReport, "story_id">[], opts: { corrected: boolean; knownArticleIds?: string[] }) {
   const known = new Set(opts.knownArticleIds ?? []);
-  const lines = reports.slice(-40).map((r) => `${opts.corrected || known.has(r.id) ? "" : "【新】"}报道 ${r.id}｜事实 ${r.fact_id}｜${beijingDate(r.at)} ${beijingTime(r.at)}｜${r.source_name}${r.first_party ? "（一手）" : ""}｜${r.title}｜${r.summary ?? ""}\n事实条件与来源证据：${JSON.stringify(digestFactEvidence(r))}`);
+  const lines = reports.slice(-40).map((r) => `${opts.corrected || known.has(r.id) ? "" : "[NOVA] "}Matéria ${r.id} | Fato ${r.fact_id} | ${beijingDate(r.at)} ${beijingTime(r.at)} | ${r.source_name}${r.first_party ? " (primária)" : ""} | ${r.title} | ${r.summary ?? ""}\nCondições do fato e evidências da fonte: ${JSON.stringify(digestFactEvidence(r))}`);
   return opts.corrected
-    ? `事件当前标题：${story.title}\n\n报道内容或事实证据经过更正。请只依据下面这些报道的当前内容重写综述，不要沿用以前版本的说法。\n报道（按时间）：\n${lines.join("\n")}`
-    : `事件当前标题：${story.title}\n${story.digest ? `上一版综述：${story.digest}\n` : ""}\n报道（按时间，标【新】的是上一版之后的新报道）：\n${lines.join("\n")}`;
+    ? `Título atual do evento: ${story.title}\n\nO conteúdo ou as evidências das matérias foram corrigidos. Reescreva o resumo apenas com base no conteúdo atual das matérias abaixo; não reaproveite afirmações de versões anteriores.\nMatérias (em ordem cronológica):\n${lines.join("\n")}`
+    : `Título atual do evento: ${story.title}\n${story.digest ? `Resumo da versão anterior: ${story.digest}\n` : ""}\nMatérias (em ordem cronológica; as marcadas [NOVA] chegaram depois da versão anterior):\n${lines.join("\n")}`;
 }
 
 /**

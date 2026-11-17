@@ -86,7 +86,7 @@ test('outward valve and missing credentials cannot send wakes',async()=>{
 });
 
 test('the 09:00 digest dispatches follow-ups once per Beijing day, including agent-only work',async()=>{
- const now=Date.parse('2026-10-18T01:00:00Z');found=[quiet];await sendDigest(now);await sendDigest(now+60_000);
+ const now=Date.parse('2026-10-18T12:00:00Z');found=[quiet];await sendDigest(now);await sendDigest(now+60_000);
  assert.deepEqual(hits.map(h=>h.body.type),['alert.digest']);assert.equal(hits[0]!.body.subject,'digest:2026-10-18');
  await sendDigest(now+86400_000);assert.equal(hits.length,2);
 });
@@ -215,23 +215,23 @@ test('owner alerts claim AI was notified only after the hub actually accepts the
  status=500;tellStatus=200;found=[fullOutage];
  await checkAlerts(now);
  assert.equal(told.length,1);
- assert.ok(!told[0]!.body.text.includes('已自动通知 AI'),'unaccepted event wake must not claim AI was notified');
+ assert.ok(!told[0]!.body.text.includes('já foi avisada'),'unaccepted event wake must not claim AI was notified');
  assert.ok(told[0]!.body.text.includes('把这条发给 AI 排查处理'));
 
  const at=new Date(Date.now()-3600_000);
  await sql`INSERT INTO settings(key,value,updated_at) VALUES('heartbeat.worker','{}',${at})`;
  await checkWorkerHeartbeat();
  assert.equal(told.length,2);
- assert.ok(!told[1]!.body.text.includes('已自动通知 AI'),'unaccepted worker wake must not claim AI was notified');
- assert.ok(told[1]!.body.text.includes('把这条发给 AI 排查重启'));
+ assert.ok(!told[1]!.body.text.includes('já foi avisada'),'unaccepted worker wake must not claim AI was notified');
+ assert.ok(told[1]!.body.text.includes('Mande isto para a IA investigar e reiniciar'));
 
  await sql`DELETE FROM settings WHERE key IN ('alerts.state','heartbeat.worker','watchdog.worker') OR key LIKE 'webhook.event.%'`;
  told.length=0;status=200;tellStatus=200;found=[fullOutage];
  await checkAlerts(now+10*60_000);
- assert.ok(told[0]!.body.text.includes('已自动通知 AI 排查处理'));
+ assert.ok(told[0]!.body.text.includes('A IA já foi avisada automaticamente para investigar'));
  await sql`INSERT INTO settings(key,value,updated_at) VALUES('heartbeat.worker','{}',${at})`;
  await checkWorkerHeartbeat();
- assert.ok(told[1]!.body.text.includes('已自动通知 AI 排查重启'));
+ assert.ok(told[1]!.body.text.includes('A IA já foi avisada para investigar e reiniciar'));
 });
 
 test('a failed owner send after waking never mints a second incident id on retry',async()=>{
@@ -253,7 +253,7 @@ test('a failed owner send after waking never mints a second incident id on retry
   tellStatus=200;
   await checkAlerts(t0+180_000);
   assert.equal(hits.filter(h=>h.body.subject===outageNoSince.key).length,1,'pre-woken outage without since must dispatch once');
-  assert.ok(told.at(-1)!.body.text.includes('已自动通知 AI 排查处理'));
+  assert.ok(told.at(-1)!.body.text.includes('A IA já foi avisada automaticamente para investigar'));
  } finally {
   delete process.env.FEISHU_ALERT_WEBHOOK_URL;
  }

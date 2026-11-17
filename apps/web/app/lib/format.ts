@@ -33,13 +33,13 @@ export function relativeTime(iso: string, now = Date.now()): string {
 export function timeAgo(iso: string, now = Date.now()): string | null {
   const t = Date.parse(iso);
   const s = Math.max(0, Math.round((now - t) / 1000));
-  if (s < 60) return "刚刚";
+  if (s < 60) return "agora";
   const m = Math.round(s / 60);
-  if (m < 60) return `${m} 分钟前`;
+  if (m < 60) return `há ${m} min`;
   const h = Math.round(m / 60);
-  if (h < 24) return `${h} 小时前`;
+  if (h < 24) return `há ${h} h`;
   const d = Math.round(h / 24);
-  return d < 30 ? `${d} 天前` : null;
+  return d < 30 ? `há ${d} dias` : null;
 }
 
 export function fullDateTime(iso: string): string {

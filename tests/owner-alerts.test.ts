@@ -17,7 +17,7 @@ const told: { auth: string | null; key: string; text: string }[] = [];
 const grouped: string[] = [];
 let hub: "up" | "refusing" | "down" | "takes one" = "up";
 // Outside production every alert names its environment first.
-const unlabelled = (text: string) => text.replace(/^【[^】]+】/, "");
+const unlabelled = (text: string) => text.replace(/^\[[^\]]+\] /, "");
 const feishu = await stub(async (_hit, req) => {
   if (req.url.endsWith("/auth/v3/tenant_access_token/internal")) return { code: 0, tenant_access_token: "fictional-token", expire: 7200 };
   // The app sends content as a JSON string, the group's bot webhook as an object.

@@ -45,15 +45,15 @@ const provider = await stub((_hit, req) => {
   const body = JSON.parse(req.body);
   const user = String(body.messages.at(-1).content);
   users.push(user);
-  const ids = [...user.matchAll(/【候选 (C\d+)】/g)].map(m => m[1]);
-  const matching = new Set([...user.matchAll(/【候选 (C\d+)】（该事实已有 \d+ 篇报道；事实标题：(.*)）/g)]
+  const ids = [...user.matchAll(/\[Candidato (C\d+)\]/g)].map(m => m[1]);
+  const matching = new Set([...user.matchAll(/\[Candidato (C\d+)\] \(este fato já tem \d+ matéria\(s\); título do fato: (.*)\)/g)]
     .filter(m => m[2] === sameOccurrenceTitle).map(m => m[1]));
-  if (user.includes("报道 A")) {
+  if (user.includes("Matéria A")) {
     pairCalls += 1;
     if (pairFails) return { choices: [{ message: { content: "不是 JSON" } }] };
   }
   const pairRelation = !pairAnswers ? relation : String(body.model).includes("mimo") ? pairAnswers.mimo : pairAnswers.deepseek;
-  const answer = user.includes("报道 A")
+  const answer = user.includes("Matéria A")
     ? { a: "a", b: "b", relation: pairRelation, confidence: 1, difference: "" }
     : { query: "当前动作", decisions: ids.map(id => ({ id,
       relation: sameOccurrenceTitle ? matching.has(id) ? "SAME_OCCURRENCE" : "UNRELATED" : relation, confidence: 1, note: "" })), selection };
@@ -78,7 +78,7 @@ async function report(text: string, scope = "single", selected = true, from = so
   const { articleId } = await upsertMaterial({ sourceId: from, url: `https://example.org/value/${randomUUID()}`, title: text,
     bodyText: text, bodyStatus: "ok", via: "fetch", publishedAt });
   await sql`INSERT INTO analyses(article_id,input_revision,origin,relevance,title_zh,summary_zh,category,score,selected,output)
-    VALUES(${articleId},1,'rule','pass',${text},${text},'ai-products',80,${selected},${sql.json({ scope, fact: scope === "composite" ? null : { title: text, subject: text, action: "发布", object: text } })})`;
+    VALUES(${articleId},1,'rule','pass',${text},${text},'software',80,${selected},${sql.json({ scope, fact: scope === "composite" ? null : { title: text, subject: text, action: "发布", object: text } })})`;
   await publishArticle(articleId);
   return articleId;
 }
@@ -180,14 +180,14 @@ test("a material revision rechecks value in the same batch while keeping its con
     await upsertMaterial({ sourceId, url: article!.url, title: revised, bodyText: revised,
       bodyStatus: "ok", via: "fetch", publishedAt: article!.published_at });
     await sql`INSERT INTO analyses(article_id,input_revision,origin,relevance,title_zh,summary_zh,category,score,selected,output)
-      VALUES(${id},${revision},'rule','pass',${revised},${revised},'ai-products',80,true,
+      VALUES(${id},${revision},'rule','pass',${revised},${revised},'software',80,true,
         ${sql.json({ scope: "single", fact: { title: revised, subject: text, action: "介绍", object: text } })})`;
     assert.deepEqual([(await state(id)).grouping_status,(await state(id)).selected], ["pending",false]);
     selection = { addsValue, reason: addsValue ? "补充了新测量结果" : "仅措辞变化" };
     relation = "UNRELATED"; // The new value judgement cannot move its established identity.
     const prompts = users.length;
     const result = await groupArticle(id);
-    assert.equal(users.slice(prompts).filter((user) => !user.includes("报道 A")).length, 1, "one existing batch judges the replacement revision");
+    assert.equal(users.slice(prompts).filter((user) => !user.includes("Matéria A")).length, 1, "one existing batch judges the replacement revision");
     assert.deepEqual([result.verdict,result.factId,result.storyId], ["kept",original.factId,original.storyId]);
     assert.deepEqual([(await state(id)).selection_adds_value,(await state(id)).selected], [addsValue,addsValue]);
     const calls = provider.hits();
@@ -257,7 +257,7 @@ for (const addsValue of [false, true]) test(`a selected composite supplies readi
   assert.ok(users.at(-1)!.includes(text + "综合首发"));
   assert.ok(users.at(-1)!.includes("末项功能支持输出透明图层"), "the end of a public composite summary remains readable");
   assert.ok(users.at(-1)!.includes("原文核心功能：可调参数、自动资源和多人联机"), "saved original evidence covers facts omitted by a terse summary");
-  assert.doesNotMatch(users.at(-1)!, /【候选 C\d+】/);
+  assert.doesNotMatch(users.at(-1)!, /\[Candidato C\d+\]/);
   assert.equal(result.verdict, "new-story", "the new report owns its identity independently of the reading context");
   assert.equal((await state(background)).fact_id, null);
   assert.equal((await sql`SELECT 1 FROM fact_articles WHERE article_id=${background}`).length, 0);
@@ -296,8 +296,8 @@ test("a launch selected before the identity window is still reader coverage for 
   const calls = provider.hits();
   const result = await groupArticle(id);
   assert.equal(provider.hits(), calls + 1, "judged in the batch call");
-  assert.ok(users.at(-1)!.includes("已公开精选阅读背景 R1") && users.at(-1)!.includes(text + "首发"));
-  assert.doesNotMatch(users.at(-1)!, /【候选 C\d+】/);
+  assert.ok(users.at(-1)!.includes("Contexto de leitura já publicado R1") && users.at(-1)!.includes(text + "首发"));
+  assert.doesNotMatch(users.at(-1)!, /\[Candidato C\d+\]/);
   assert.equal(result.verdict, "new-story", "identity keeps its own window");
   assert.deepEqual([(await state(id)).selection_adds_value, (await state(id)).selected], [false, false]);
 });
@@ -313,8 +313,8 @@ test("a selected fact still among the candidates is not repeated as reading cont
   selection = { addsValue: false, reason: "已覆盖" };
   const id = await report(text + "再次介绍");
   await groupArticle(id);
-  const batch = users.findLast(u => u.startsWith(`【新报道】\n标题：${text}再次介绍`))!;
-  assert.match(batch, /【候选 C1】/);
+  const batch = users.findLast(u => u.startsWith(`[Nova matéria] \nTítulo: ${text}再次介绍`))!;
+  assert.match(batch, /\[Candidato C1\]/);
   assert.doesNotMatch(batch, /阅读背景/);
 });
 
@@ -453,7 +453,7 @@ test("history telling the news of a card around its date stays out of selection 
   otherNews("SAME_STORY");
   const own = await report(text + "另有其事", "single", true, sourceId, daysAgo(3));
   assert.equal((await groupArticle(own)).verdict, "historical");
-  assert.deepEqual([(await state(own)).selected, (await state(own)).selection_value_reason], [true, "历史资料按原文时间归档"]);
+  assert.deepEqual([(await state(own)).selected, (await state(own)).selection_value_reason], [true, "Material antigo arquivado pela data original"]);
 });
 
 test("a composite whose news is on a card stays out; one with news of its own keeps its card", async () => {
@@ -611,7 +611,7 @@ test("a revision that lets the owner's article into selection replaces their pos
   const revised = text + "文章补全";
   await upsertMaterial({ sourceId: ownArticles, url: row!.url, title: revised, bodyText: revised, bodyStatus: "ok", via: "fetch", publishedAt: new Date() });
   await sql`INSERT INTO analyses(article_id,input_revision,origin,relevance,title_zh,summary_zh,category,score,selected,output)
-    VALUES(${article},2,'rule','pass',${revised},${revised},'ai-products',80,true,${sql.json({ scope: "single", fact: { title: revised, subject: text, action: "发布", object: text } })})`;
+    VALUES(${article},2,'rule','pass',${revised},${revised},'software',80,true,${sql.json({ scope: "single", fact: { title: revised, subject: text, action: "发布", object: text } })})`;
   const result = await groupArticle(article);
   assert.deepEqual([result.verdict, result.retired], ["kept", [post]]);
   assert.deepEqual([(await state(article)).selected, (await state(post)).selected], [true, false]);
@@ -648,7 +648,7 @@ test("a revision of a report that stayed out does not bring its card back", asyn
   const revised = text + "帖子改了措辞";
   await upsertMaterial({ sourceId: ownPosts, url: row!.url, title: revised, bodyText: revised, bodyStatus: "ok", via: "fetch", publishedAt: new Date() });
   await sql`INSERT INTO analyses(article_id,input_revision,origin,relevance,title_zh,summary_zh,category,score,selected,output)
-    VALUES(${post},2,'rule','pass',${revised},${revised},'ai-products',80,true,${sql.json({ scope: "single", fact: { title: revised, subject: text, action: "发布", object: text } })})`;
+    VALUES(${post},2,'rule','pass',${revised},${revised},'software',80,true,${sql.json({ scope: "single", fact: { title: revised, subject: text, action: "发布", object: text } })})`;
   assert.equal((await groupArticle(post)).verdict, "kept");
   assert.deepEqual([(await state(post)).selected, (await state(article.id)).selected], [false, true]);
 });

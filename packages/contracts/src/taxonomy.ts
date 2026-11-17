@@ -39,10 +39,10 @@ export const CHANNEL_KEYS = ["all", "news", "x", "firstParty"] as const;
 export type ChannelKey = (typeof CHANNEL_KEYS)[number];
 
 export const CHANNEL_LABELS: Record<ChannelKey, string> = {
-  all: "全部",
-  news: "资讯",
+  all: "Tudo",
+  news: "Notícias",
   x: "X",
-  firstParty: "一手",
+  firstParty: "Fontes oficiais",
 };
 
 export function isChannelKey(value: unknown): value is ChannelKey {

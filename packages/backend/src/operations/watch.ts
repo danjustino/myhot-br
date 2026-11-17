@@ -11,10 +11,10 @@ const WORKER_STALE_MS = 30 * 60_000;
 const WORKER_DOWN: Finding = {
   key: "worker",
   level: "now",
-  title: "后台处理服务停了，网站不会出现新内容",
-  impact: "新内容的采集、处理、推送和日报全部暂停，网站停在旧内容上",
-  heals: "系统自动重启没有成功",
-  action: "把这条发给 AI 排查重启",
+  title: "O serviço de processamento parou; o site não vai receber conteúdo novo",
+  impact: "Coleta, processamento, envios e resumo diário estão todos parados; o site fica com o conteúdo antigo",
+  heals: "O reinício automático do sistema não funcionou",
+  action: "Mande isto para a IA investigar e reiniciar",
 };
 
 /**
@@ -36,7 +36,7 @@ export async function checkWorkerHeartbeat(): Promise<void> {
     if (stale) {
       const woken = await wakeAgent({ ...WORKER_DOWN, since: hb.updated_at }, now);
       const shown = woken
-        ? { ...WORKER_DOWN, action: "已自动通知 AI 排查重启；如果半小时还没收到“已恢复”再问 AI" }
+        ? { ...WORKER_DOWN, action: "A IA já foi avisada para investigar e reiniciar; se em meia hora não chegar \"Resolvido\", pergunte à IA" }
         : WORKER_DOWN;
       const msg = formatAlert(shown, hb.updated_at, now);
       await sendAlert(msg.title, msg.lines);

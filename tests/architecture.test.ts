@@ -168,9 +168,9 @@ test("every environment variable the code reads is listed in a template, and eve
 // Caught: offset arithmetic, a zone glued onto an interpolated date or time, Intl or SQL given the zone's
 // name. A fixed instant written with its zone, or a parser's default zone, converts nothing.
 const convertsBeijingTime = (line: string) =>
-  /(?<![\d.])8 ?\* ?(?:3_?600|60 ?\* ?60)/.test(line)
-  || (line.includes("+08:00") && line.includes("${"))
-  || /(?:timeZone:|AT TIME ZONE) ?["']Asia\/Shanghai/.test(line);
+  /-3 ?\* ?(?:3_?600|60 ?\* ?60)/.test(line)
+  || (line.includes("-03:00") && line.includes("${"))
+  || /(?:timeZone:|AT TIME ZONE) ?["']America\/Sao_Paulo/.test(line);
 const CONVERTS_BEIJING_TIME: Record<string, string> = {
   "packages/contracts/src/time.ts": "the conversions themselves",
   "packages/backend/src/editorial/analyze.ts": "the score input keeps the form its prompt was tuned on (whole seconds without .000)",

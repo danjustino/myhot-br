@@ -1,13 +1,13 @@
 {
-  "latestVersion": "2026-10-01T08:00",
+  "latestVersion": "2026-11-13T08:00",
   "releases": [
     {
-      "date": "2026-10-01",
+      "date": "2026-11-13",
       "time": "08:00",
-      "kind": "公告",
-      "title": "网站上线",
+      "kind": "Aviso",
+      "title": "Site no ar",
       "body": [
-        "用 AIHOT 开源框架搭起了这个站：自动盯住信源、精选、把同一件事归到一起，每天出一份日报。"
+        "O site foi montado com o framework de código aberto AIHOT: acompanha as fontes automaticamente, escolhe os destaques, junta as matérias sobre o mesmo assunto e publica um resumo todos os dias."
       ]
     }
   ]

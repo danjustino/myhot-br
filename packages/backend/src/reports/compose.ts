@@ -77,7 +77,7 @@ async function saveReport(kind: ReportKind, key: string, start: Date, end: Date,
 /** "10 月 4 日 08:00": one end of a quiet issue's window, as its lead paragraph names it. */
 function windowPoint(at: Date): string {
   const day = beijingDate(at);
-  return `${Number(day.slice(5, 7))} 月 ${Number(day.slice(8, 10))} 日 ${beijingTime(at)}`;
+  return `${Number(day.slice(8, 10))}/${day.slice(5, 7)} ${beijingTime(at)}`;
 }
 
 /** The highlights a daily's front page lists after its lead (今日看点). */
@@ -128,12 +128,12 @@ const PERIOD_EVENTS = { weekly: 20, monthly: 30 } as const;
 /** A section is introduced once it carries this many events; one or two are read faster than introduced. */
 const INTRO_EVENTS = 3;
 /** The longest overview and introduction an issue prints; the brief asks for less, writers overshoot. */
-const OVERVIEW_CHARS = { weekly: 240, monthly: 340 } as const;
-const INTRO_CHARS = 90;
+const OVERVIEW_CHARS = { weekly: 580, monthly: 820 } as const; // Portuguese: ~2.4x the Chinese these were tuned on
+const INTRO_CHARS = 220;
 /** The brief's values for each kind: its name, its span and how long its overview should be. */
 const BRIEF = {
-  weekly: { kindName: "周报", span: "一周", sentences: "三句话", chars: "160" },
-  monthly: { kindName: "月报", span: "个月", sentences: "三到四句话", chars: "240" },
+  weekly: { kindName: "semanal", span: "semana", sentences: "três frases", chars: "400" },
+  monthly: { kindName: "mensal", span: "mês", sentences: "três a quatro frases", chars: "600" },
 } as const;
 
 export const PeriodSchema = z.object({
@@ -147,15 +147,15 @@ export const PeriodSchema = z.object({
  * what the issue carries.
  */
 export function periodPrompt(kind: "weekly" | "monthly", startDate: string, endDateInclusive: string, groups: Array<{ label: string; items: Candidate[] }>) {
-  const list = groups.map((g) => [`【${g.label}】`, ...g.items.map((e) => `- ${e.title}｜${e.summary.slice(0, 140)}`)].join("\n")).join("\n");
+  const list = groups.map((g) => [`[${g.label}]`, ...g.items.map((e) => `- ${e.title} | ${e.summary.slice(0, 300)}`)].join("\n")).join("\n");
   const introduced = groups.filter((g) => g.items.length >= INTRO_EVENTS).map((g) => g.label);
   return {
     system: promptText("report-period", {
       ...BRIEF[kind],
-      sections: introduced.length ? promptText("report-period-sections", { columns: introduced.map((l) => `「${l}」`).join("") }) : promptText("report-period-no-sections"),
+      sections: introduced.length ? promptText("report-period-sections", { columns: introduced.map((l) => `"${l}"`).join(", ") }) : promptText("report-period-no-sections"),
       sectionsExample: introduced.length ? `{"${introduced[0]}": "..."}` : "{}",
     }),
-    user: `本期：${startDate} 至 ${endDateInclusive}\n${list}`,
+    user: `Período: ${startDate} a ${endDateInclusive}\n${list}`,
   };
 }
 
@@ -183,7 +183,8 @@ export function grounded(text: string, corpus: string): boolean {
 /** The leading whole sentences of a text that fit in `max` characters; null when not even the first does. */
 export function fitted(text: string, max: number): string | null {
   let out = "";
-  for (const sentence of text.trim().match(/[^。！？]+(?:[。！？]+[」”’）]*|$)/g) ?? []) {
+  // A sentence ends at ! ? or a period before a space or the end, so "R$ 7.999" and "iOS 18.1" stay whole.
+  for (const sentence of text.trim().match(/.+?(?:[。！？!?]+|\.(?=[\s”’")]|$))[”’")]*(?:\s+|$)|.+$/gsu) ?? []) {
     if ([...out + sentence].length > max) break;
     out += sentence;
   }
@@ -245,7 +246,7 @@ async function composePeriod(kind: "weekly" | "monthly", key: string, startDate:
   const [lead] = top as [Candidate, ...Candidate[]];
   const content = {
     kind,
-    title: kind === "weekly" ? `${SITE.name} 周报 · ${key}` : `${SITE.name} 月报 · ${key}`,
+    title: kind === "weekly" ? `${SITE.name} Semanal · ${key}` : `${SITE.name} Mensal · ${key}`,
     ...(kind === "weekly" ? { isoLabel: key } : { monthLabel: key }),
     periodStart: startDate,
     periodEnd: endDateInclusive,

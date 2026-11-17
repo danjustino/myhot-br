@@ -8,7 +8,7 @@ import { useLabels } from "../sources/uses.ts";
 
 /** Sources that serve modules only (out of the news, with uses): counted and named apart from the news sources. */
 const moduleOnly = sql`(participation_mode = 'isolated' AND uses <> '{}')`;
-const usesText = (uses: string[]) => uses.map((u) => useLabels()[u] ?? u).join("、");
+const usesText = (uses: string[]) => uses.map((u) => useLabels()[u] ?? u).join(", ");
 
 /** The change from b to a: "+12%", "—" without a b. Also the modules' reports. */
 export const pct = (a: number, b: number) => (b ? `${a >= b ? "+" : ""}${(((a - b) / b) * 100).toFixed(0)}%` : "—");
@@ -16,8 +16,8 @@ export const pct = (a: number, b: number) => (b ? `${a >= b ? "+" : ""}${(((a - 
 export const n = (v: number) => v.toLocaleString("en-US");
 
 /** Who changed a source, as the owner reads it: the admin pages, or the AI's scripts. */
-const by = (actor: string) => actor.startsWith("admin:") ? "后台" : /^(ops-script|codex)/.test(actor) ? "AI" : actor;
-const brief = (reason: string | null) => !reason ? "没写原因" : [...reason].length > 60 ? `${[...reason].slice(0, 60).join("")}…` : reason;
+const by = (actor: string) => actor.startsWith("admin:") ? "painel" : /^(ops-script|codex)/.test(actor) ? "IA" : actor;
+const brief = (reason: string | null) => !reason ? "sem motivo informado" : [...reason].length > 60 ? `${[...reason].slice(0, 60).join("")}…` : reason;
 const excluded = (config: unknown) => {
   const c = (config ?? {}) as { denyUrlPrefixes?: string[]; denyCategories?: string[] };
   return [...(c.denyUrlPrefixes ?? []), ...(c.denyCategories ?? [])];
@@ -36,18 +36,18 @@ async function sourceChanges(since: Date): Promise<string[]> {
   const fenced: string[] = [];
   const fencedIds = new Set<string>();
   for (const r of rows) {
-    const who = `${by(r.actor)}，${beijingDay(r.at)}${r.module_only ? `，只给${usesText(r.uses)}用` : ""}`;
+    const who = `${by(r.actor)}, ${beijingDay(r.at)}${r.module_only ? `, só para ${usesText(r.uses)}` : ""}`;
     // The audit keeps the fields a save sent; a form saved again on a paused source repeats enabled=false.
-    if (r.after?.enabled === false && r.before?.enabled !== false && !r.enabled) paused.set(r.id, `· ${r.name}（${who}）：${brief(r.reason)}`);
+    if (r.after?.enabled === false && r.before?.enabled !== false && !r.enabled) paused.set(r.id, `· ${r.name} (${who}): ${brief(r.reason)}`);
     const added = excluded(r.after?.config).filter((rule) => !excluded(r.before?.config).includes(rule));
     if (added.length) {
-      fenced.push(`· ${r.name}（${who}，排除 ${added.join("、")}）：${brief(r.reason)}`);
+      fenced.push(`· ${r.name} (${who}, excluiu ${added.join(", ")}): ${brief(r.reason)}`);
       fencedIds.add(r.id);
     }
   }
   return [
-    ...(paused.size ? [`本周停用、现在仍停着的信源 ${paused.size} 个：`, ...paused.values()] : []),
-    ...(fenced.length ? [`本周排除了部分入口的信源 ${fencedIds.size} 个：`, ...fenced] : []),
+    ...(paused.size ? [`${paused.size} fonte(s) desativada(s) nesta semana e ainda paradas:`, ...paused.values()] : []),
+    ...(fenced.length ? [`${fencedIds.size} fonte(s) com parte das entradas excluídas nesta semana:`, ...fenced] : []),
   ];
 }
 
@@ -73,19 +73,19 @@ export async function sourceHealthWeekly(now = Date.now()) {
     sql<{ uses: string[]; failing: boolean }[]>`SELECT uses, health = 'failing' AS failing FROM sources WHERE enabled AND ${moduleOnly}`,
   ]);
   const lines = [
-    `本周收录 ${n(items!.week)} 条（上周 ${n(items!.prev)}，${pct(items!.week, items!.prev)}），其中精选 ${n(items!.selected)} 条`,
-    `在用信源 ${counts!.enabled} 个，本周新增 ${counts!.added} 个；抓取失败 ${counts!.failing} 个，不太稳定 ${counts!.degraded} 个`,
+    `${n(items!.week)} itens coletados nesta semana (semana passada: ${n(items!.prev)}, ${pct(items!.week, items!.prev)}), dos quais ${n(items!.selected)} selecionados`,
+    `${counts!.enabled} fonte(s) ativa(s), ${counts!.added} nova(s) nesta semana; ${counts!.failing} com falha de coleta, ${counts!.degraded} instável(is)`,
   ];
   if (served.length) {
     const perUse = new Map<string, number>();
     for (const s of served) for (const u of s.uses) perUse.set(u, (perUse.get(u) ?? 0) + 1);
-    const each = [...perUse].map(([u, count]) => `${usesText([u])} ${count}`).join("、");
-    lines.push(`另有只给模块用的信源 ${served.length} 个（${each}），抓取失败 ${served.filter((s) => s.failing).length} 个`);
+    const each = [...perUse].map(([u, count]) => `${usesText([u])} ${count}`).join(", ");
+    lines.push(`Além disso, ${served.length} fonte(s) só para módulos (${each}), ${served.filter((s) => s.failing).length} com falha de coleta`);
   }
   // The modules' own collectors, a line each.
   for (const m of serverModules()) if (m.sourceHealth) lines.push(...(await m.sourceHealth(now)));
   const changes = await sourceChanges(since);
   if (changes.length) lines.push("", ...changes);
-  await sendAlert("📊 信源周报", lines);
+  await sendAlert("📊 Relatório semanal das fontes", lines);
   return { failing: counts!.failing };
 }

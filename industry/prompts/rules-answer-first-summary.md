@@ -1,10 +1,10 @@
 
-【摘要答案前置规则 — 让第一句可被搜索与 AI 独立引用】
+【Regra de resumo com resposta primeiro — para a primeira frase poder ser citada sozinha por buscadores e IA】
 
-1. 第一位必须是一句可独立理解的答案，直接交代“谁做了什么、关键结果或变化是什么”；不要先铺背景、过程、动机或作者感受。
-   第一答案句必须回答原标题的核心事件，不能把正文里的演示片段、背景案例或次要功能抢成主结论。
-   “做了什么”是本条的动作：原文在介绍、演示此前已发布的产品时，第一答案句写这次介绍或演示，此前的发布只作背景交代，不写成本次推出。
-2. 第一答案句优先控制在 30-70 字。原文信息少时可以更短，但必须包含核心主体和核心动作；不要用“本文介绍了”“文章讨论了”“作者认为”“据报道”等转述套话起句。
-3. 后面只补 1-2 个最重要的要点，按“可验证事实/数字 → 对用户或行业的影响、可用性”排序。每句只承担一个要点，删掉不影响结论的背景。
-4. 保持 2-3 个紧凑陈述句，不写“结论：”“要点：”等标签，不用 Markdown 项目符号或分段；现有卡片和通知应继续按一段摘要显示。
-5. 原文不足以支持“影响”时就只写事实，不做推断；答案前置不能成为补写原文外判断的借口。
+1. A primeira frase precisa ser uma resposta que se entende sozinha, dizendo direto "quem fez o quê, qual o resultado ou mudança principal"; não comece por contexto, processo, motivação ou impressão do autor.
+   A primeira frase responde ao fato central do título original; não deixe uma demonstração, um caso de contexto ou um recurso secundário do texto virar a conclusão principal.
+   "O que fez" é a ação deste item: quando o original apresenta ou demonstra um produto lançado antes, a primeira frase fala desta apresentação ou demonstração, e o lançamento anterior entra só como contexto, sem ser escrito como lançamento de agora.
+2. A primeira frase deve ter de preferência entre 70 e 170 caracteres. Com pouca informação no original pode ser mais curta, mas precisa ter o sujeito e a ação principais; não comece com fórmulas como "o texto apresenta", "o artigo discute", "o autor acredita", "segundo informações".
+3. Depois, acrescente só 1 ou 2 pontos mais importantes, na ordem "fato ou número verificável → impacto para o usuário ou para o mercado, disponibilidade". Cada frase carrega um ponto só; corte o contexto que não muda a conclusão.
+4. Mantenha 2 ou 3 frases afirmativas e enxutas, sem rótulos como "Conclusão:" ou "Pontos:", sem marcadores de Markdown e sem parágrafos; os cartões e notificações seguem mostrando o resumo como um único parágrafo.
+5. Se o original não sustenta um "impacto", escreva só o fato, sem deduzir; a resposta primeiro não é desculpa para acrescentar julgamento que não está no original.

@@ -30,8 +30,8 @@ export function dingtalkMarkdown(c: DingtalkContent): { title: string; text: str
     `**${escape(c.title)}**`,
     `${escape(c.sourceName)} · ${c.published}`,
     c.summary ? escape(c.summary) : null,
-    c.reason ? `**${escape(c.reasonLabel)}**　${escape(c.reason)}` : null,
-    `[${escape(`在 ${SITE.name} 阅读`)}](${href(itemUrl(c.articleId))}) ｜ [${escape("原文")}](${href(c.url)})`,
+    c.reason ? `**${escape(c.reasonLabel)}** ${escape(c.reason)}` : null,
+    `[${escape(`Ler no ${SITE.name}`)}](${href(itemUrl(c.articleId))}) | [${escape("Original")}](${href(c.url)})`,
   ].filter(Boolean).join("\n\n");
   return { title: c.title, text };
 }

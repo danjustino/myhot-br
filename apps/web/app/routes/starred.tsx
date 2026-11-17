@@ -14,23 +14,23 @@ import { PhoneBar } from "../components/shell/PhoneBar";
 import type { Screen } from "../components/shell/screens";
 import { webModules } from "../site-modules";
 
-export const handle: Screen = { tab: "me", name: "收藏" };
+export const handle: Screen = { tab: "me", name: "Salvos" };
 
 export function headers() {
   return edgeTtl(300);
 }
 
 export function meta() {
-  return pageMeta({ title: "我的收藏", description: `保存在这台设备上的 ${SITE.name} 收藏。`, path: "/starred", noindex: true });
+  return pageMeta({ title: "Meus salvos", description: `Itens do ${SITE.name} salvos neste aparelho.`, path: "/starred", noindex: true });
 }
 
 function reportText(r: ImportReport): string {
-  const parts = [`新增收藏 ${r.starredAdded} 条`, `已读记录 ${r.readAdded} 条`];
-  if (r.starredSkipped || r.readSkipped) parts.push(`有 ${r.starredSkipped + r.readSkipped} 条没导入（超出数量上限或格式不对）`);
-  if (r.themeApplied) parts.push("已沿用导入的深浅色设置");
-  if (r.fontApplied) parts.push("已沿用导入的字体设置");
-  if (r.readFailed) parts.push("已读记录没能保存（浏览器存储已满或不可用）");
-  return parts.join("，");
+  const parts = [`${r.starredAdded} salvos adicionados`, `${r.readAdded} registros de leitura`];
+  if (r.starredSkipped || r.readSkipped) parts.push(`${r.starredSkipped + r.readSkipped} não importados (acima do limite ou formato errado)`);
+  if (r.themeApplied) parts.push("tema claro/escuro importado aplicado");
+  if (r.fontApplied) parts.push("fonte importada aplicada");
+  if (r.readFailed) parts.push("os registros de leitura não puderam ser salvos (armazenamento do navegador cheio ou indisponível)");
+  return parts.join("; ");
 }
 
 export default function StarredPage() {
@@ -84,9 +84,9 @@ export default function StarredPage() {
     if (!file) return;
     try {
       const report = importBundle(await file.text());
-      setNotice({ kind: report.readFailed ? "error" : "ok", text: `导入完成：${reportText(report)}` });
+      setNotice({ kind: report.readFailed ? "error" : "ok", text: `Importação concluída: ${reportText(report)}` });
     } catch (e) {
-      setNotice({ kind: "error", text: e instanceof Error ? e.message : "导入失败" });
+      setNotice({ kind: "error", text: e instanceof Error ? e.message : "Falha na importação" });
     }
   };
 
@@ -100,11 +100,11 @@ export default function StarredPage() {
   const action = "text-[12.5px] text-ink-3 transition-colors hover:text-accent";
   return (
     <div className="pb-12">
-      <PhoneBar back={{ to: "/more", label: "我的" }} title="收藏" />
+      <PhoneBar back={{ to: "/more", label: "Meu" }} title="Salvos" />
       <header className="flex flex-col gap-2 pb-4 pt-3 sm:flex-row sm:items-start sm:justify-between lg:pt-1">
         <div>
-          <h1 data-page-title="" className="text-[24px] font-semibold leading-[1.3] text-ink">收藏</h1>
-          <p className="mt-1.5 text-[13px] text-ink-3">{`本机收藏的 ${SITE.name} 内容，适合稍后阅读和回看。`}</p>
+          <h1 data-page-title="" className="text-[24px] font-semibold leading-[1.3] text-ink">Salvos</h1>
+          <p className="mt-1.5 text-[13px] text-ink-3">{`Itens do ${SITE.name} salvos neste aparelho, para ler depois ou rever.`}</p>
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:pt-1.5">
           {webModules().flatMap((m) => m.starredImports ?? []).map((i) => (
@@ -113,24 +113,24 @@ export default function StarredPage() {
             </button>
           ))}
           <button type="button" onClick={() => fileRef.current?.click()} className={action}>
-            导入文件
+            Importar arquivo
           </button>
           {mounted && starred.length > 0 && (
             <button type="button" onClick={doExport} className={`${action} inline-flex items-center gap-1`}>
-              <IconDownload size={13} /> 导出
+              <IconDownload size={13} /> Exportar
             </button>
           )}
           <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" onChange={(e) => doImport(e.target.files?.[0])} />
         </div>
       </header>
-      <p className="rounded-tile border border-line bg-surface px-4 py-2.5 text-[12.5px] text-ink-3">不用登录，收藏直接存在这个浏览器里；清除浏览器数据或换设备都不会同步，换设备前可以先导出备份。</p>
+      <p className="rounded-tile border border-line bg-surface px-4 py-2.5 text-[12.5px] text-ink-3">Sem login: os salvos ficam guardados neste navegador; se você limpar os dados do navegador ou trocar de aparelho, eles não vão junto. Antes de trocar, exporte um backup.</p>
       <Presence show={!!notice} enter="anim-notice-in" exit="anim-fade-out" duration={160}>
         <div
           role="status"
           className={`mt-3 flex items-start justify-between gap-3 rounded-tile px-4 py-2.5 text-[13px] ${notice?.kind === "ok" ? "bg-accent-soft text-accent-ink dark:text-accent" : "bg-hot-soft text-hot"}`}
         >
           {notice?.text}
-          <button type="button" aria-label="关闭" onClick={() => setNotice(null)} className="shrink-0 opacity-70 hover:opacity-100">
+          <button type="button" aria-label="Fechar" onClick={() => setNotice(null)} className="shrink-0 opacity-70 hover:opacity-100">
             <IconClose size={14} />
           </button>
         </div>
@@ -138,9 +138,9 @@ export default function StarredPage() {
       {!mounted ? null : starred.length === 0 ? (
         <div className="mt-3 flex flex-col items-center rounded-card border border-dashed border-line-strong px-6 py-12 text-center">
           <IconBookmark size={20} className="text-ink-4" />
-          <p className="mt-3 text-[13px] text-ink-3">还没有收藏内容。点开任意一条内容，在详情页点击收藏即可添加。</p>
+          <p className="mt-3 text-[13px] text-ink-3">Nada salvo ainda. Abra qualquer item e toque em salvar na página de detalhes.</p>
           <Link to="/" className="mt-4 text-[12.5px] font-medium text-accent hover:text-accent-ink">
-            去看精选 →
+            Ver os destaques →
           </Link>
         </div>
       ) : (
@@ -155,9 +155,9 @@ export default function StarredPage() {
                   <span className="min-w-0 truncate text-ink-3">{current?.sourceName ?? s.sourceName}</span>
                   {s.publishedAt && <span className="num shrink-0">· {fullDateTime(s.publishedAt)}</span>}
                   <span className="ml-auto hidden shrink-0 sm:inline">
-                    收藏于 <span className="num">{fullDateTime(s.savedAt)}</span>
+                    Salvo em <span className="num">{fullDateTime(s.savedAt)}</span>
                   </span>
-                  <button type="button" aria-label="取消收藏" title="取消收藏" onClick={() => removeStar(s.id)} className="relative z-10 -my-1 ml-auto grid size-7 shrink-0 place-items-center rounded-full text-ink-4 transition-colors hover:bg-bg-sunk hover:text-ink sm:ml-0">
+                  <button type="button" aria-label="Remover dos salvos" title="Remover dos salvos" onClick={() => removeStar(s.id)} className="relative z-10 -my-1 ml-auto grid size-7 shrink-0 place-items-center rounded-full text-ink-4 transition-colors hover:bg-bg-sunk hover:text-ink sm:ml-0">
                     <IconClose size={14} />
                   </button>
                 </div>
@@ -171,8 +171,8 @@ export default function StarredPage() {
                   )}
                 </h2>
                 {s.summary && <p className="mt-1.5 line-clamp-2 text-[14px] leading-[1.75] text-ink-3">{shortAddresses(s.summary)}</p>}
-                {unavailable && <p className="mt-2 text-[12.5px] text-hot">这条内容已经下架，收藏会一直保留，直到你手动移除。</p>}
-                {status === "summary-only" && <p className="mt-2 text-[12.5px] text-amber-ink">应来源方要求，这条内容现在只提供摘要。</p>}
+                {unavailable && <p className="mt-2 text-[12.5px] text-hot">Este conteúdo foi retirado do ar; o item salvo fica aqui até você remover.</p>}
+                {status === "summary-only" && <p className="mt-2 text-[12.5px] text-amber-ink">A pedido da fonte, este conteúdo agora só tem resumo.</p>}
               </li>
             );
           })}

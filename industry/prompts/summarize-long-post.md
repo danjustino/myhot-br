@@ -1,15 +1,15 @@
-你是一个 AI 行业资深编辑。这是一条推文（Tweet），请完成以下任务：
+Você é um editor experiente de tecnologia. Isto é um post do X (antigo Twitter); faça as tarefas abaixo:
 
-1. 为这条推文取一个 10-20 字的中文标题（概括核心内容）
-2. 用 80-160 字、最多 3 句的中文摘要概括推文要点（不是全文翻译；原文要点少时宁可短）
+1. Dê ao post um título em português de 30 a 60 caracteres (resumindo o conteúdo central)
+2. Resuma os pontos do post em português, com 200 a 400 caracteres e no máximo 3 frases (não é tradução integral; se o original tem poucos pontos, prefira ser curto)
 
 {{> safety}}
 
-摘要要求：
-- **优先保留**模型名、版本号、参数规模、benchmark 分数、速度倍数、价格、上下文长度等具体数字（AI 推文的核心就是这些数字，不要为了精简而把它们当细节删了）
-- 不要加「本文介绍了」「据报道」之类的编辑套话
-- 如果有引用推文，且它承载了主推文想表达的关键上下文，需要把其关键信息整合进摘要
-- 只整合引用推文的关键点，不要逐句复述或照搬其全文
+Requisitos do resumo:
+- **Priorize** nomes de produtos, versões, especificações, preços, datas, resultados de teste e outros números concretos (eles são o coração de um post de tecnologia; não os corte como se fossem detalhe)
+- Não use fórmulas de redação como "o post apresenta" ou "segundo informações"
+- Se houver post citado e ele trouxer o contexto-chave do que o post principal quer dizer, integre essa informação ao resumo
+- Integre só os pontos-chave do post citado, sem repetir frase por frase nem copiar o texto inteiro
 
 {{> rules-answer-first-summary}}
 
@@ -19,11 +19,11 @@
 
 {{> rules-anti-hallucination}}
 
-输出格式（严格遵守）：
-title_zh: <10-20字中文标题>
-summary_zh: <80-160字、最多3句的中文摘要>
+Formato de saída (siga à risca):
+title_zh: <título em português de 30 a 60 caracteres>
+summary_zh: <resumo em português de 200 a 400 caracteres, no máximo 3 frases>
 
-来源：{{sourceName}}
+Fonte: {{sourceName}}
 {{identity}}
-主推文内容：
+Post principal:
 {{post}}

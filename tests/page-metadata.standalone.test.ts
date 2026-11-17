@@ -28,7 +28,7 @@ import { dateLine } from "../apps/web/app/features/report/format.ts";
 import { startWebServer, type WebServer } from "../apps/web/tests/web-server.ts";
 
 const at = "2026-10-04T08:00:00.000Z";
-const item: FeedItemSummary = { id: "metadata-fixture", title: "可核实的测试报道", summary: "报道摘要", reason: null, source: { name: "Fixture" }, publishedAt: at, timelineAt: at, category: "ai-models", tags: [], score: 80, selected: true, channel: "news", x: null };
+const item: FeedItemSummary = { id: "metadata-fixture", title: "Matéria de teste verificável", summary: "报道摘要", reason: null, source: { name: "Fixture" }, publishedAt: at, timelineAt: at, category: "ia", tags: [], score: 80, selected: true, channel: "news", x: null };
 const detail: SiteItemDetail = { ...item, x: null, originalTitle: null, links: { original: "https://example.org/report" }, discoveredAt: at, story: null, readingMode: "full", author: null, body: { zh: "<p>可核实的测试正文。</p>", original: null, zhKind: "original", complete: true }, outline: [], relatedStories: [], topics: [], tagTopics: {}, daily: null, indexable: true, googleNoindex: false, markdownAvailable: true, group: null, hasTranslation: false, bodyLanguage: "zh", mentions: [] };
 /** Article pages by id: the fixture, one kept from Google only, one kept from every engine. */
 const details: Record<string, SiteItemDetail> = {
@@ -41,7 +41,7 @@ const citation = (available: boolean): ReportCitation => ({ itemId: available ? 
 /** A daily whose one entry was withdrawn: its highlights are only the reports a thin issue is filled with. */
 const leadless = (): ReportDetail => ({ ...report("daily"), key: "2026-10-05", lead: null, leadItemId: null,
   sections: [{ label: "模型", summary: null, items: [citation(false)] }], highlights: [{ ...citation(true), itemId: "metadata-pick", title: "同一时段值得一看的报道" }] });
-const report = (kind: ReportKind): ReportDetail => ({ kind, key: kind === "daily" ? "2026-10-04" : kind === "weekly" ? "2026-W40" : "2026-10", issueNumber: 1, title: `${SITE.name} 测试刊物`, generatedAt: at, lead: { title: "本期已验证的重要变化", leadParagraph: "本期的导读与依据。" }, leadItemId: item.id, overview: null, highlights: [citation(true)], sections: [], flashes: [], cover: null, metrics: {}, readingMinutes: 1, prev: null, next: null, mentions: [] });
+const report = (kind: ReportKind): ReportDetail => ({ kind, key: kind === "daily" ? "2026-10-04" : kind === "weekly" ? "2026-W40" : "2026-10", issueNumber: 1, title: `${SITE.name} 测试刊物`, generatedAt: at, lead: { title: "Mudanças importantes verificadas nesta edição", leadParagraph: "Abertura e fontes desta edição." }, leadItemId: item.id, overview: null, highlights: [citation(true)], sections: [], flashes: [], cover: null, metrics: {}, readingMinutes: 1, prev: null, next: null, mentions: [] });
 const story: StoryDetail = { publicId: "metadata-story", title: "测试事件的最新进展", status: "settled", reportCount: 1, sourceCount: 1, firstReportAt: at, latestAt: at, digest: "当前可核实的事件综述。", digestUpdatedAt: "2026-10-04T09:00:00.000Z", summary: null, excerpt: null, latest: null, latestReport: null, whyHot: { participants48h: 0, newParticipants6h: 0, recentReports24h: 0, observationComplete: true, rank: null }, developments: [], officialReports: [], timeline: [{ id: item.id, title: item.title, summary: item.summary, source: { name: item.source.name, firstParty: true }, publishedAt: at, selected: true }], heat: [], related: [], topics: [], mentions: [] };
 /** The same event once a second report joined it. */
 const severalReports: StoryDetail = { ...story, publicId: "metadata-story-several", reportCount: 2, sourceCount: 2 };
@@ -85,7 +85,7 @@ function structured($: cheerio.CheerioAPI): Array<Record<string, unknown>> {
 }
 
 test("filtered feeds keep their exact content address but leave indexing to the public landing pages", async () => {
-  for (const base of ["/", "/all"]) for (const query of ["channel=news", "category=ai-models", "tag=Agent", "channel=x&category=paper&tag=Agent"]) {
+  for (const base of ["/", "/all"]) for (const query of ["channel=news", "category=ia", "tag=Agent", "channel=x&category=ciencia&tag=Agent"]) {
     const $ = await page(`${base}?${query}&utm_source=fixture&anchorAt=old&deep=1`);
     assert.equal($("meta[name=robots]").attr("content"), "noindex, follow", `${base}?${query}`);
     assert.equal($("link[rel=canonical]").attr("href"), `${web.origin}${base}?${query}`);
@@ -104,11 +104,11 @@ test("ordinary feed pages remain indexable and normalize ignored parameters", as
   }
 });
 
-test("全部动态's later pages leave search to its first page and keep their links followed", async () => {
+test("Últimas notícias' later pages leave search to its first page and keep their links followed", async () => {
   const $ = await page("/all?channel=all&tab=relevance&anchorAt=old&page=2&utm_source=fixture");
   assert.equal($("meta[name=robots]").attr("content"), "noindex, follow");
   assert.equal($("link[rel=canonical]").attr("href"), `${web.origin}/all?page=2`);
-  assert.match($("title").text(), new RegExp(`^${SEO_TITLES.all} · 第 2 页`), "the title still names what the list is");
+  assert.match($("title").text(), new RegExp(`^${SEO_TITLES.all} · página 2`), "the title still names what the list is");
   assert.ok($("main").text().includes(item.title), "the page itself is unchanged");
 });
 
@@ -120,14 +120,14 @@ test("an event page stands in search once it gathers more than one report", asyn
   assert.equal(several("meta[name=googlebot]").length, 0);
 });
 
-// Chinese readers search issues by the date as they write it ("10月4日 AI 新闻"), not by the key.
-for (const [kind, label, date] of [["daily", "日报", "10月4日"], ["weekly", "周报", "9月28日—10月4日"], ["monthly", "月报", "2026年10月"]] as const) {
+// Readers search issues by the date as they write it ("4 out Notícias"), not by the key.
+for (const [kind, label, date] of [["daily", "Resumo diário", "4 out"], ["weekly", "Resumo semanal", "28 set – 4 out"], ["monthly", "Resumo mensal", "outubro de 2026"]] as const) {
   test(`${kind} issue metadata describes its visible lead and the permanent entry names the latest issue's date`, async () => {
     const r = report(kind);
     const $ = await page(`/${kind}/${r.key}`);
-    const title = `${withSubject(label)}｜${date}：${r.lead!.title}`;
+    const title = `${withSubject(label)} | ${date}: ${r.lead!.title}`;
     // A daily is described by its own headlines; its lead's paragraph is that article's own description.
-    const description = kind === "daily" ? `${date} ${withSubject("新闻")}：${r.lead!.title}；${item.title}。` : `${date} ${withSubject("资讯")}：${r.lead!.leadParagraph}`;
+    const description = kind === "daily" ? `${date} ${withSubject("Notícias")}: ${r.lead!.title}; ${item.title}.` : `${date} ${withSubject("Notícias")}: ${r.lead!.leadParagraph}`;
     assert.equal($("meta[name=description]").attr("content"), description);
     assert.equal($("title").text(), `${title} · ${SITE.name}`);
     assert.equal($("meta[property='og:title']").attr("content"), title);
@@ -147,7 +147,7 @@ for (const [kind, label, date] of [["daily", "日报", "10月4日"], ["weekly", 
 
 test("a daily without a lead is not headed by a report its highlights were only filled with", async () => {
   const $ = await page(`/daily/${leadless().key}`);
-  const title = `${withSubject("日报")}｜10月5日`;
+  const title = `${withSubject("Resumo diário")} | 5 out`;
   assert.equal($("title").text(), `${title} · ${SITE.name}`);
   assert.equal(structured($).find((entry) => entry["@type"] === "NewsArticle")!.headline, title);
 });
@@ -159,11 +159,11 @@ test("the latest issue is one page however its address is written", async () => 
   }
 });
 
-test("an issue's date reads as Chinese readers write it, across months and years", () => {
-  assert.equal(reportDateLabel("daily", "2026-10-17"), "10月17日");
-  assert.equal(reportDateLabel("weekly", "2026-W42"), "10月12日—18日");
-  assert.equal(reportDateLabel("weekly", "2026-W53"), "12月28日—1月3日");
-  assert.equal(reportDateLabel("monthly", "2026-01"), "2026年1月");
+test("an issue's date reads as Brazilian readers write it, across months and years", () => {
+  assert.equal(reportDateLabel("daily", "2026-10-17"), "17 out");
+  assert.equal(reportDateLabel("weekly", "2026-W42"), "12–18 out");
+  assert.equal(reportDateLabel("weekly", "2026-W53"), "28 dez – 3 jan");
+  assert.equal(reportDateLabel("monthly", "2026-01"), "janeiro de 2026");
 });
 
 test("a report without an edited lead uses only a still-public visible highlight", () => {

@@ -1,34 +1,34 @@
-# 使用规则
+# Termos de uso
 
-这是开源框架自带的模板。上线前请按你的实际情况改写（运营主体、允许和不允许的用途、联系方式），必要时请专业人士审阅。
+Este é o modelo que vem com o framework de código aberto. Antes de publicar, adapte-o à sua realidade (responsável, usos permitidos e proibidos, contato) e, se necessário, peça revisão a um profissional.
 
-| 项 | 值 |
+| Item | Valor |
 |---|---|
-| 版本 | 请填写 |
-| 生效日期 | 请填写 |
-| 运营主体 | 请填写 |
-| 联系方式 | 请填写 |
+| Versão | A preencher |
+| Vigência | A preencher |
+| Responsável | A preencher |
+| Contato | A preencher |
 
-页首说明：
+Nota de abertura:
 
-> 本站聚合公开信源，用模型生成中文摘要与精选，原文版权归各来源所有。网页、RSS、公开 API 与 MCP 均可匿名使用。
+> Este site reúne fontes públicas e usa modelos de IA para gerar resumos em português e destaques; os direitos dos textos originais pertencem a cada fonte. Site, RSS, API pública e MCP podem ser usados de forma anônima.
 
-## 1. 内容与版权
+## 1. Conteúdo e direitos autorais
 
-本站展示的标题、摘要和推荐理由由模型根据公开来源生成，可能有误，重要信息请以原文为准。原文版权归各来源所有；站内只在来源允许时展示全文，其余只展示摘要和原文链接。
+Os títulos, resumos e motivos de leitura exibidos aqui são gerados por modelos de IA a partir de fontes públicas e podem conter erros; para informações importantes, vale o original. Os direitos dos textos originais pertencem a cada fonte; o site só mostra o texto completo quando a fonte permite, e nos demais casos mostra apenas o resumo e o link do original.
 
-## 2. 来源方的更正与下架
+## 2. Correção e remoção a pedido da fonte
 
-如果你是来源方，希望更正、下架或调整展示方式，请通过反馈页联系我们，我们会尽快处理。
+Se você é a fonte e quer corrigir, remover ou mudar a forma de exibição de um conteúdo, fale conosco pela página de feedback; vamos tratar o pedido o quanto antes.
 
-## 3. 使用本站的数据
+## 3. Uso dos dados do site
 
-请写明你允许的用途（例如个人阅读、组织内部使用），以及需要事先取得你同意的用途（例如商业产品、公开转载、批量再分发）。
+Descreva aqui os usos que você permite (por exemplo, leitura pessoal ou uso interno em uma organização) e os que exigem sua autorização prévia (por exemplo, produtos comerciais, republicação pública ou redistribuição em massa).
 
-## 4. 接口与频率
+## 4. Interfaces e frequência
 
-RSS、公开 API 和 MCP 为匿名只读接口。请按响应中的缓存时间轮询，遇到 429 请遵守 Retry-After，不要并发重试。
+RSS, API pública e MCP são interfaces anônimas e só de leitura. Respeite o tempo de cache informado nas respostas; ao receber 429, siga o Retry-After e não faça novas tentativas em paralelo.
 
-## 5. 免责
+## 5. Isenção de responsabilidade
 
-本站按“现状”提供，不保证内容完整、准确和持续可用。
+O site é oferecido "no estado em que se encontra", sem garantia de que o conteúdo seja completo, preciso ou esteja sempre disponível.

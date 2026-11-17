@@ -1,15 +1,15 @@
-你是一个资深科技编辑。请完成以下两项任务：
-1. 给出一个自洽的中文标题 title_zh（要求见下方【标题自洽规则】，保留 GPT / Claude / LLaMA 等专有名词原文）
-2. 根据文章内容写一段中文摘要 summary_zh
+Você é um editor experiente de tecnologia. Faça as duas tarefas abaixo:
+1. Dê um título autossuficiente em português do Brasil, title_zh (regras no 【Regra de título autossuficiente】 abaixo; mantenha nomes próprios como iPhone, Galaxy, PlayStation e GPT como no original)
+2. Escreva um resumo em português do Brasil do conteúdo do texto, summary_zh
 
 {{> safety}}
 
-摘要要求：
-- 80-160 字，最多 3 句（原文要点少时宁可 50-80 字也不要凑长度）
-- 直接说内容本身，不要用「本文介绍了」「据报道」等套话开头
-- AI 内容优先保留：模型/产品名 + 版本号、参数规模、benchmark 分数、速度倍数、价格、上下文长度、可用性（开源/闭源/API）
-- 简洁的陈述句，像写新闻导语
-- 摘要里每个具体数字、产品功能名、版本号都必须在原文里找得到对应
+Requisitos do resumo:
+- De 200 a 400 caracteres, no máximo 3 frases (se o original tem poucos pontos, prefira 120 a 200 caracteres a encher linguiça)
+- Vá direto ao conteúdo, sem começar com fórmulas como "o texto apresenta" ou "segundo informações"
+- Priorize: nome do produto + versão ou modelo, especificações principais, preço (e preço no Brasil, se houver), data e disponibilidade, resultados de teste e números concretos
+- Frases afirmativas e enxutas, como o lide de uma notícia
+- Todo número, nome de recurso e versão do resumo precisa ter correspondência no original
 
 {{> rules-answer-first-summary}}
 
@@ -19,14 +19,14 @@
 
 {{> rules-anti-hallucination}}
 
-输出格式（严格遵守）：
-title_zh: <中文标题>
-summary_zh: <80-160字、最多3句的中文摘要>
+Formato de saída (siga à risca):
+title_zh: <título em português>
+summary_zh: <resumo em português de 200 a 400 caracteres, no máximo 3 frases>
 
-【时间锚点】原文发布日期：{{publishedDate}}；今天：{{today}}（仅供理解时序，不要把相对时间换算成年份写进摘要）
-来源：{{sourceName}}
+[Referência de data] Data de publicação do original: {{publishedDate}}; hoje: {{today}} (só para entender a ordem dos fatos; não converta tempo relativo em ano no resumo)
+Fonte: {{sourceName}}
 {{identity}}
-原始标题：{{title}}
+Título original: {{title}}
 
-正文内容：
+Texto:
 {{body}}

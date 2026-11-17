@@ -47,9 +47,9 @@ export function pushEnabled(kind: string): boolean {
 export async function ensureContentTargets() {
   await sql`
     INSERT INTO notify_targets (key, purpose, kind, enabled, config_ref, note) VALUES
-      ('feishu-content-main', 'content', 'feishu_webhook', false, 'FEISHU_PUSH_WEBHOOK_URL', '飞书内容主群'),
-      ('feishu-content-mirror', 'content', 'feishu_webhook', false, 'FEISHU_PUSH_MIRROR_WEBHOOK_URL', '飞书内容镜像群'),
-      ('dingtalk-content-main', 'content', 'dingtalk_webhook', false, 'DINGTALK_PUSH_WEBHOOK_URL', '钉钉内容群')
+      ('feishu-content-main', 'content', 'feishu_webhook', false, 'FEISHU_PUSH_WEBHOOK_URL', 'Grupo principal de conteúdo (Feishu)'),
+      ('feishu-content-mirror', 'content', 'feishu_webhook', false, 'FEISHU_PUSH_MIRROR_WEBHOOK_URL', 'Grupo espelho de conteúdo (Feishu)'),
+      ('dingtalk-content-main', 'content', 'dingtalk_webhook', false, 'DINGTALK_PUSH_WEBHOOK_URL', 'Grupo de conteúdo (DingTalk)')
     ON CONFLICT (key) DO NOTHING`;
 }
 
@@ -132,12 +132,12 @@ export async function resendDelivery(id: number, version?: string): Promise<{ st
     SELECT d.status, d.updated_at::text AS version, d.payload, d.target_key, t.config_ref, t.kind, t.enabled, t.enabled_at, d.subject_kind, d.subject_id
     FROM deliveries d JOIN notify_targets t ON t.key = d.target_key WHERE d.id = ${id}`;
   if (!d) throw new Error(`delivery ${id} not found`);
-  if (d.status !== "unknown" && d.status !== "failed") throw new Conflict("这条投递不需要处理");
+  if (d.status !== "unknown" && d.status !== "failed") throw new Conflict("Esta entrega não precisa de ação");
   if (!pushEnabled(d.kind)) throw new Error("content push is disabled in this environment");
-  if (!d.enabled) throw new Conflict("这个推送群已停用");
+  if (!d.enabled) throw new Conflict("Este grupo de envio está desativado");
   const current = d.subject_kind === "selected" ? await selectedContent(d.subject_id) : null;
   if (current && (current.status !== "ready" || (d.enabled_at && current.article.discovered_at < d.enabled_at))) {
-    throw new Conflict("这条内容已不再符合推送条件");
+    throw new Conflict("Este conteúdo não atende mais às condições de envio");
   }
   const payload = current ? (d.kind === "dingtalk_webhook" ? current.dingtalk : current.card) : d.payload;
   const url = d.config_ref ? credential("integrations", d.config_ref) : undefined;
@@ -146,7 +146,7 @@ export async function resendDelivery(id: number, version?: string): Promise<{ st
   // update runs. Only the request that claims the version the operator read may send the card.
   const claimed = await sql`UPDATE deliveries SET status = 'sending', attempts = attempts + 1, payload = ${sql.json(payload as never)}, updated_at = now()
     WHERE id = ${id} AND status IN ('unknown', 'failed') AND updated_at::text = ${version ?? d.version}`;
-  if (!claimed.count) throw new Conflict("这条投递已被其他操作处理，请刷新后重试");
+  if (!claimed.count) throw new Conflict("Esta entrega já foi tratada por outra operação; atualize e tente de novo");
   return sendDelivery(id, d.kind, url, payload);
 }
 
@@ -157,9 +157,9 @@ export async function resendDelivery(id: number, version?: string): Promise<{ st
  */
 export async function markStaleDeliveries(): Promise<{ unknown: number; failed: number }> {
   const cutoff = new Date(Date.now() - 15 * 60_000);
-  const unknown = await sql`UPDATE deliveries SET status = 'unknown', response = coalesce(response, '发送中进程中断，是否送达未知'), updated_at = now()
+  const unknown = await sql`UPDATE deliveries SET status = 'unknown', response = coalesce(response, 'Processo interrompido durante o envio; não se sabe se chegou'), updated_at = now()
                             WHERE status = 'sending' AND updated_at < ${cutoff}`;
-  const failed = await sql`UPDATE deliveries SET status = 'failed', response = coalesce(response, '发送前进程中断，没有发出'), updated_at = now()
+  const failed = await sql`UPDATE deliveries SET status = 'failed', response = coalesce(response, 'Processo interrompido antes do envio; nada foi enviado'), updated_at = now()
                            WHERE status = 'pending' AND updated_at < ${cutoff}`;
   return { unknown: unknown.count, failed: failed.count };
 }
@@ -169,7 +169,7 @@ export async function resolveDelivery(id: number, input: { outcome: "sent" | "dr
   input = z.object({ outcome: z.enum(["sent", "drop", "resend"]), note: z.string().trim().min(1) }).parse(input);
   const [before] = await sql<{ status: string; version: string }[]>`SELECT status, updated_at::text AS version FROM deliveries WHERE id = ${id}`;
   if (!before) return null;
-  if (before.status !== "unknown" && before.status !== "failed") throw new Conflict("这条投递不需要处理");
+  if (before.status !== "unknown" && before.status !== "failed") throw new Conflict("Esta entrega não precisa de ação");
   if (input.outcome !== "resend") {
     // An explicit drop is terminal, like other skips. Failed is still actionable; encoding a drop
     // in its audit alone left it in the recovery list and allowed it to be sent again.
@@ -177,9 +177,9 @@ export async function resolveDelivery(id: number, input: { outcome: "sent" | "dr
     return sql.begin(async tx => {
       const changed = await tx`UPDATE deliveries SET status = ${status},
         sent_at = CASE WHEN ${status} = 'sent' THEN coalesce(sent_at, now()) ELSE sent_at END,
-        response = ${`${input.outcome === "sent" ? "人工确认已送达" : "人工放弃"}：${input.note}`}, updated_at = now()
+        response = ${`${input.outcome === "sent" ? "Entrega confirmada manualmente" : "Descartado manualmente"}: ${input.note}`}, updated_at = now()
         WHERE id = ${id} AND status IN ('unknown', 'failed') AND updated_at::text = ${before.version}`;
-      if (!changed.count) throw new Conflict("这条投递已被其他操作处理，请刷新后重试");
+      if (!changed.count) throw new Conflict("Esta entrega já foi tratada por outra operação; atualize e tente de novo");
       await audit(actor, `delivery.${input.outcome}`, `delivery:${id}`, input.note, { status: before.status }, { status }, { db: tx });
       return { id, status };
     });

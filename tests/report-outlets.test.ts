@@ -33,7 +33,7 @@ async function citation(title: string) {
     bodyText: 'Licensed report fixture', bodyHtml: '<p>Licensed report fixture</p>', bodyStatus: 'ok', via: 'fetch', publishedAt: generatedAt });
   await sql`UPDATE articles SET grouping_status = 'complete' WHERE id = ${articleId}`;
   await sql`INSERT INTO analyses (article_id, input_revision, origin, relevance, category, title_zh, summary_zh, score, selected)
-    VALUES (${articleId}, 1, 'rule', 'pass', 'industry', ${title}, ${`${title} current summary`}, 90, true)`;
+    VALUES (${articleId}, 1, 'rule', 'pass', 'mercado', ${title}, ${`${title} current summary`}, 90, true)`;
   await publishArticle(articleId, { releasedAt: generatedAt });
   return { itemId: articleId, title, summary: `${title} frozen summary`, sourceUrl: `https://example.com/${T}/${sequence}`, sourceName: 'Issue source' };
 }
@@ -131,7 +131,7 @@ test('a daily citation without a frozen summary, and a flash with an earlier fro
 test('discovery counts exactly the publicly indexed topics it lists', () => {
   const text = llmsTxt({ hasDailies: false, hasWeekly: false, hasMonthly: false, topics: [{ slug: 'sample', name: 'Example', definition: 'Example topic' }], tools: [],
     modules: { api: [], pace: [], pages: [], topics: [], access: [], usage: [], guideClients: [], ways: [] } });
-  assert.match(text, /（1 个主题，下一节逐个列出）/);
+  assert.match(text, /\(1 tópicos, listados um a um na próxima se/);
 });
 
 // A saved overview/section introduction can still repeat the withdrawn citation after the list and

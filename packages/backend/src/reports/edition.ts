@@ -19,8 +19,8 @@ import { evidenceCondition, listedCondition, ownFactEvidenceCondition } from "..
 /** Each category's section; several categories may share one, in the order the pack lists them. */
 export const SECTION_OF: Record<string, string> = Object.fromEntries(CATEGORIES.map((c) => [c.key, c.section]));
 export const SECTION_ORDER: readonly string[] = [...new Set(CATEGORIES.map((c) => c.section))];
-/** An item without a category goes into the section of the industry category, else into the last one. */
-const DEFAULT_SECTION = SECTION_OF.industry ?? SECTION_ORDER.at(-1)!;
+/** An item without a category goes into the section of the "mercado" (business) category, else into the last one. */
+const DEFAULT_SECTION = SECTION_OF.mercado ?? SECTION_ORDER.at(-1)!;
 export const sectionOf = (category: string | null) => SECTION_OF[category ?? ""] ?? DEFAULT_SECTION;
 
 /** A daily's size: the entries readers get in full, and the one-line flashes after them. */
@@ -123,10 +123,10 @@ export async function periodReports(start: Date, end: Date): Promise<ReportRow[]
 }
 
 function roleOf(kind: string, official: boolean): string {
-  if (official) return kind === "x_search" ? "X·官方" : "官方";
+  if (official) return kind === "x_search" ? "X·Oficial" : "Oficial";
   if (kind === "x_search") return "X·KOL";
-  if (kind === "mp_account") return "公众号";
-  return "媒体";
+  if (kind === "mp_account") return "WeChat";
+  return "Imprensa";
 }
 
 function reportEntry(r: ReportRow): ReportEntry {

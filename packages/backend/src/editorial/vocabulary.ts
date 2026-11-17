@@ -25,7 +25,7 @@ export function normalizeTags(v: unknown): string[] {
 }
 
 /** The category boundaries the structure step reads, one line per category. */
-export const CATEGORY_GUIDE = CATEGORIES.map((c) => `- ${c.key}（${c.label}）：${c.guide}`).join("\n");
+export const CATEGORY_GUIDE = CATEGORIES.map((c) => `- ${c.key} (${c.label}): ${c.guide}`).join("\n");
 
 /** The industry's headline launch (RELEASE): narrower than its category, which also holds prices and benchmarks. */
 export const isRelease = (category: string | null, tags: readonly string[]) => RELEASE !== null && category === RELEASE.category && tags.includes(RELEASE.tag);

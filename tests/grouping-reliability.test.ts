@@ -25,8 +25,8 @@ let response: "complete" | "missing" = "complete";
 const provider = await stub((_hit, request) => {
   const body = JSON.parse(request.body);
   const text = body.messages[1].content as string;
-  if (text.includes("【报道 A】")) return { choices: [{ message: { content: JSON.stringify({ a: "发布", b: "发布", relation: "SAME_OCCURRENCE", difference: "", confidence: 1 }) } }] };
-  const ids = [...text.matchAll(/【候选 (C\d+)】/g)].map(m => m[1]);
+  if (text.includes("[Matéria A]")) return { choices: [{ message: { content: JSON.stringify({ a: "发布", b: "发布", relation: "SAME_OCCURRENCE", difference: "", confidence: 1 }) } }] };
+  const ids = [...text.matchAll(/\[Candidato (C\d+)\]/g)].map(m => m[1]);
   return { choices: [{ message: { content: JSON.stringify({ query: "新模型发布", decisions: (response === "missing" ? [] : ids).map(id => ({ id, relation: "SAME_OCCURRENCE", confidence: 1, note: "" })), selection: { addsValue: true, reason: "fixture news" } }) } }] };
 });
 pointModels(provider.url, ["deepseek-flash", "mimo-v2.6-flash", "glm-5.3-flash"]);
@@ -40,7 +40,7 @@ let factId: number;
 async function report(suffix: string, composite = false) {
   const { articleId } = await upsertMaterial({ sourceId, url: `https://example.org/group-${T}/${suffix}`, title: `新模型发布${T}`, bodyText: "今日发布新模型和价格。", bodyStatus: "ok", via: "fetch", publishedAt: new Date() });
   await sql`INSERT INTO analyses (article_id,input_revision,origin,relevance,category,title_zh,summary_zh,score,selected,output)
-    VALUES (${articleId},1,'rule','pass','ai-models',${`新模型发布${T} ${suffix}`},${`新模型发布和价格${T} ${suffix}`},80,true,${sql.json({ scope: composite ? "composite" : "single", fact: { title: "新模型发布", subject: "实验室", action: "发布", object: "模型" } })})`;
+    VALUES (${articleId},1,'rule','pass','ia',${`新模型发布${T} ${suffix}`},${`新模型发布和价格${T} ${suffix}`},80,true,${sql.json({ scope: composite ? "composite" : "single", fact: { title: "新模型发布", subject: "实验室", action: "发布", object: "模型" } })})`;
   await sql`UPDATE articles SET processing_state='analyzed' WHERE id=${articleId}`;
   await publishArticle(articleId);
   return articleId;

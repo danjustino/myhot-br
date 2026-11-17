@@ -4,7 +4,7 @@ import { CATEGORY_KEYS, toPublicApiCategory, type CategoryKey, type ChannelKey, 
 import { STORY_INDEX_MIN_REPORTS, type FeedItemSummary, type ItemSummary, type MediaView, type XPostView } from "@aihot/contracts/site";
 import { POLICY } from "@aihot/site";
 import { sql, type Db } from "../db.ts";
-import { isChineseText } from "../lib/text.ts";
+import { isTargetLanguage } from "../lib/text.ts";
 import { isEmptyOrLinkOnly, withXArticle } from "../content/posts.ts";
 import { proxiedImage, proxiedImageSet } from "../media/imgproxy.ts";
 import { sourceOwnsPost } from "../sources/account.ts";
@@ -230,7 +230,7 @@ export function toFeedItemSummary(row: ItemRow): FeedItemSummary {
  * Every exit uses the same language decision as writing and translation.
  */
 export function isChineseBody(a: { language?: string | null; body_text?: string | null }): boolean {
-  return isChineseText(a.body_text ?? "", a.language);
+  return isTargetLanguage(a.body_text ?? "", a.language);
 }
 
 /** The complete Chinese translation an export (Markdown, full RSS) carries; a page also shows a partial one. */

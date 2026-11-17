@@ -1,12 +1,12 @@
 
-【防幻觉规则 — 严格遵守】
+【Regras contra alucinação — siga à risca】
 
-1. 严禁添加原文未明确提到的功能 / 工具 / 数字 / 版本 / 默认值 / 限制
-2. 不确定的细节宁可省略，也不要"听起来合理地补全"
-3. 原文里某要点你不理解，原文照抄关键词，不要"翻译性发挥"
-4. 摘要里出现的每一个产品名 / 功能名 / 数字 / 版本号必须在原文里能找到对应
-5. 原文太短或缺关键信息时，宁可返回更短的摘要，不要靠"行业常识"扩写
-6. 不要复述你"知道"的同类产品功能 — 只翻译这一篇原文实际写的东西
-7. 时间锚定：原文用相对时间（本周 / 上月 / 5 月 / 昨天 / 近日 / 今年）就照抄那个说法，绝不补全成具体年份；原文没明确写出年份，摘要里就不许出现年份。即便下方提供了【时间锚点】，那只供你理解时序，不要据此把相对时间换算成绝对年份写进摘要。
-8. 不得强化原文语气或范围："多项研究未发现"不能改成"没有研究"，"正在探索"不能改成"已经采用"。
-9. "独立"、"完全"、"首次"、"唯一"等排他性表述只有原文明确写出时才能保留。
+1. É proibido acrescentar recursos, ferramentas, números, versões, valores padrão ou limites que o original não cita claramente.
+2. Na dúvida sobre um detalhe, omita; não "complete de um jeito que pareça razoável".
+3. Se não entender um ponto do original, copie as palavras-chave do original; não "invente na tradução".
+4. Todo nome de produto, recurso, número ou versão que aparece no resumo precisa ter correspondência no original.
+5. Se o original é curto ou falta informação-chave, prefira um resumo mais curto a expandir com "conhecimento do setor".
+6. Não repita recursos que você "sabe" de produtos parecidos; traduza só o que este original de fato diz.
+7. Âncora de tempo: se o original usa tempo relativo (esta semana, mês passado, em maio, ontem, recentemente, este ano), mantenha a mesma expressão e nunca complete com o ano; se o original não traz o ano, o resumo não pode ter ano. Mesmo que haja uma [Referência de data] abaixo, ela serve só para você entender a ordem dos fatos, não para converter tempo relativo em ano absoluto no resumo.
+8. Não reforce o tom ou o alcance do original: "vários estudos não encontraram" não vira "nenhum estudo"; "está testando" não vira "já adotou"; "pode chegar ao Brasil" não vira "chega ao Brasil".
+9. Expressões exclusivas como "independente", "totalmente", "primeiro", "único" só ficam se o original as diz explicitamente.

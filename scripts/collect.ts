@@ -1,5 +1,5 @@
 // Runs collection for given sources now (development / operations helper).
-// node --env-file=.env scripts/collect.ts rss-openai-news rss-hugging-face ...
+// node --env-file=.env scripts/collect.ts rss-tecnoblog rss-canaltech ...
 import { closeDb } from "@aihot/backend/db";
 import { stopBoss } from "@aihot/backend/jobs/queue";
 import { installModules } from "@aihot/backend/modules";
