@@ -1,128 +1,126 @@
-# 把它改成你的行业
+# Adaptar para o seu setor
 
-这份仓库默认是一个“AI 行业”的示例站：示范信源是一批公开的 AI 资讯源，精选口味是 AIHOT 在 AI 领域调了很久的那一套。要把它变成“法律热点”“HR 热点”“黄金热点”，要改的东西几乎都在 [`site/`](../site/)（这个站自己的名字、文案、品牌和页面）和 [`industry/`](../industry/)（行业的分类、信源、提示词和门槛）这两个文件夹里，代码基本不用动。
+Por padrão este repositório é um site de exemplo de **tecnologia geral para o público brasileiro**: as fontes de exemplo são veículos de tecnologia brasileiros, e o critério de seleção foi adaptado do AIHOT, que o calibrou por muito tempo para notícias de IA. Para transformar o site em "notícias de direito", "notícias de RH" ou "notícias de agronegócio", quase tudo o que muda fica em duas pastas: [`site/`](../site/) (nome, textos, marca e páginas deste site) e [`industry/`](../industry/) (categorias, fontes, prompts e limites do setor). O código quase não muda.
 
-如果你用 Claude Code、Codex 这类 Agent，可以把下面这段直接发给它，然后回答它的问题：
+Se você usa um agente como Claude Code ou Codex, pode mandar o texto abaixo direto para ele e depois responder às perguntas que ele fizer:
 
 ```text
-请读 AGENTS.md 和 docs/customize.md，把这个站改成「XX 行业」的热点站。
-我关心的是：……（写你想盯的信源、你觉得什么消息重要、什么不重要，越具体越好）。
-改完帮我跑 npm run typecheck、npm test 和 node scripts/smoke.ts，并告诉我还需要我自己决定哪些事。
+Leia o AGENTS.md e o docs/customize.md e transforme este site num site de notícias do setor "XX".
+O que me importa: … (as fontes que quero acompanhar, o que considero notícia importante e o que não é; quanto mais específico, melhor).
+No fim, rode npm run typecheck, npm test e node scripts/smoke.ts e me diga o que ainda preciso decidir.
 ```
 
-下面是它（或者你）要做的事，按顺序。
+Abaixo está, em ordem, o que ele (ou você) precisa fazer.
 
-## 1. 站名和文案：`site/site.ts`
+## 1. Nome e textos: `site/site.ts`
 
-[`site/site.ts`](../site/site.ts) 的每个导出项和字段旁边都写了直接注释（用在哪里、能不能留空、默认值什么意思），从上往下按注释改即可；改完重新构建（`docker compose up -d --build`）前后端一起生效。跨文件或上线后要注意的只有这几条：
+Cada exportação e campo de [`site/site.ts`](../site/site.ts) tem um comentário ao lado (onde é usado, se pode ficar vazio, o que o padrão significa); é só ir de cima para baixo seguindo os comentários. Depois, reconstrua (`docker compose up -d --build`) para valer no front e no back. Só estes pontos envolvem outros arquivos ou cuidado depois do lançamento:
 
-- **站点地址不在 `site.ts` 里**：部署时用环境变量 `SITE_URL` 设置（`SITE.defaultUrl` 只是没设 `SITE_URL` 时的本地兜底）。
-- **一起改的名字**：改 `SITE.name` 时顺手把 `SITE.organization.name`（给搜索引擎看的结构化数据）一起改掉；`SITE.crawlerName` 写你自己的抓取标识，别冒用别人的站名。
-- **上线或有人接入后不要再改的标识**：`SITE.mcpPrefix`（MCP 工具名前缀）、`PUBLIC_CATEGORIES`（公开接口与订阅源的类别合并和改名）、`ABOUT.termsAnchor`（外部写死过的锚点）；`SITE.interfaceVersion` 只升不降，改了已有公开字段或含义时升主版本。
-- **出刊时间写整点或半点**：`EDITION_TIMES`（北京时间 `HH:mm`）由每半小时一次的排程检查，日报窗口、缺期告警和各处时间文案都读它。
-- **导航隐藏的范围**：`NAV.hidden` 目前只开放 `"/hot"` 和 `"/topics"`（一并处理侧栏、底栏、“我的”页、返回链接、面包屑，以及隐藏 `"/hot"` 时的首页热点条和事件页名次；直接打开地址仍能访问）。
-- **限流说明与实际一致**：前面的反向代理真的按 IP 限流了，再填 `ACCESS.ratePerMinute`。
+- **O endereço do site não fica no `site.ts`**: no deploy, defina a variável de ambiente `SITE_URL` (`SITE.defaultUrl` é só o valor local quando `SITE_URL` não existe).
+- **Nomes que mudam juntos**: ao mudar `SITE.name`, mude também `SITE.organization.name` (dados estruturados para buscadores); em `SITE.crawlerName`, ponha a sua própria identificação de robô, sem usar o nome de outro site.
+- **Identificadores que não mudam depois do lançamento ou de alguém se conectar**: `SITE.mcpPrefix` (prefixo das ferramentas MCP), `PUBLIC_CATEGORIES` (fusão e renomeação de categorias nas interfaces públicas e feeds) e `ABOUT.termsAnchor` (âncora que outros sites podem ter fixado); `SITE.interfaceVersion` só sobe, e sobe a versão principal quando um campo público existente muda de forma ou significado.
+- **Horários de publicação em hora cheia ou meia hora**: `EDITION_TIMES` (`HH:mm` no horário de Brasília) é verificado pelo agendamento a cada meia hora; a janela do resumo diário, o alerta de edição faltando e todos os textos com horário leem dele.
+- **O que a navegação pode esconder**: `NAV.hidden` aceita por enquanto só `"/hot"` e `"/topics"` (cuida junto da barra lateral, da barra inferior, da página "Meu", dos links de voltar, das trilhas de navegação e, ao esconder `"/hot"`, da faixa de em alta na página inicial e das posições na página do fato; o endereço continua acessível diretamente).
+- **O aviso de limite de acesso precisa ser verdadeiro**: só preencha `ACCESS.ratePerMinute` se o proxy reverso à frente realmente limita por IP.
 
-## 2. 分类、标签和主题：`industry/taxonomy.ts`、`industry/topics.json`
+## 2. Categorias, tags e tópicos: `industry/taxonomy.ts`, `industry/topics.json`
 
-[`industry/taxonomy.ts`](../industry/taxonomy.ts) 定义类别（`CATEGORIES`）、报头重点发布计数（`RELEASE`）、总述免核对通用词（`PLAIN_TERMS`）、内容类型（`ITEM_TYPES`）、标签词表与近义词（`CATEGORY_TAGS`、`TOPIC_TAGS`、`ENTITY_TAGS`、`TAG_SYNONYMS`），以及公司名录和防张冠李戴词典（`ENTITIES`、`IDENTITY_LEXICON`、`PUBLISHER_DOMAINS`、`IDENTITY_CONTEXT_ALIASES`）。各字段含义直接看文件内注释，改动时注意这几处联动：
+[`industry/taxonomy.ts`](../industry/taxonomy.ts) define as categorias (`CATEGORIES`), a contagem de lançamentos de destaque do cabeçalho (`RELEASE`), termos comuns dispensados de checagem no resumo geral (`PLAIN_TERMS`), os tipos de conteúdo (`ITEM_TYPES`), o vocabulário de tags e sinônimos (`CATEGORY_TAGS`, `TOPIC_TAGS`, `ENTITY_TAGS`, `TAG_SYNONYMS`) e o cadastro de empresas e o dicionário contra atribuição errada (`ENTITIES`, `IDENTITY_LEXICON`, `PUBLISHER_DOMAINS`, `IDENTITY_CONTEXT_ALIASES`). O significado de cada campo está nos comentários do arquivo; ao mudar, preste atenção nestes vínculos:
 
-- **网址里的 `key` 上线后不改**：`CATEGORIES` 的 `key` 会进网址和订阅地址（`/all?category=`、`/feed/category/<key>.xml`）。要让某一类在公开接口、RSS 和 MCP 里并进另一类发布（网页上仍分开），在 `site/site.ts` 的 `PUBLIC_CATEGORIES` 里配。
-- **和提示词同步**：改了 `CATEGORIES`、标签词表或 `ITEM_TYPES`，要同步改 `industry/prompts/structure.md`（归类原则与标签规则）、`content-understanding.md`（内容类型枚举）和 `selection-score.md`（各内容类型的五维权重表）。
-- **不需要防张冠李戴时可清空**：`IDENTITY_LEXICON`、`PUBLISHER_DOMAINS`、`IDENTITY_CONTEXT_ALIASES` 用来保证标题摘要里提到的公司在原文里出现过；你的行业不需要这项检查时设为空数组 `[]`。
-- **`industry/topics.json`**（主题目录 `/topics`）：站点启动时读取，改完重新构建（`docker compose up -d --build`）生效。分 `company`（公司与机构）、`field`（方向）、`genre`（内容形态）三组，`slug` 上线后不要改：
-  - `company` 主题用 `entityId`（`ENTITIES` 的 id）收以这家公司为主体的报道；一篇报道的主体有几家公司时，标题里点了它的名才算。可选 `aliases`：搜索框里只搜这个词，也能找出这家公司的报道。
-  - `field` 和 `genre` 主题用 `tags` 收打了这些标签的报道。
+- **A `key` que vai na URL não muda depois do lançamento**: a `key` de `CATEGORIES` entra nas URLs e nos endereços de feed (`/all?category=`, `/feed/category/<key>.xml`). Para que uma categoria seja publicada junto com outra na API pública, no RSS e no MCP (continuando separada no site), configure `PUBLIC_CATEGORIES` em `site/site.ts`.
+- **Sincronize com os prompts**: se mudar `CATEGORIES`, o vocabulário de tags ou `ITEM_TYPES`, ajuste também `industry/prompts/structure.md` (regras de categoria e de tags), `content-understanding.md` (lista de tipos de conteúdo) e `selection-score.md` (tabela de pesos das cinco dimensões por tipo de conteúdo).
+- **Pode esvaziar se não precisar da proteção contra atribuição errada**: `IDENTITY_LEXICON`, `PUBLISHER_DOMAINS` e `IDENTITY_CONTEXT_ALIASES` garantem que a empresa citada no título e no resumo aparece no original; se o seu setor não precisa disso, use a lista vazia `[]`.
+- **`industry/topics.json`** (diretório de tópicos `/topics`): lido quando o site sobe; depois de mudar, reconstrua (`docker compose up -d --build`). Tem três grupos, `company` (empresas e instituições), `field` (áreas) e `genre` (formatos de conteúdo); o `slug` não muda depois do lançamento:
+  - Tópicos `company` usam `entityId` (o id em `ENTITIES`) para reunir matérias cujo assunto principal é aquela empresa; quando uma matéria tem várias empresas como assunto, só conta se o título citar o nome dela. `aliases` é opcional: buscar só esse termo na caixa de busca também encontra as matérias da empresa.
+  - Tópicos `field` e `genre` usam `tags` para reunir as matérias com essas tags.
 
-## 3. 信源：`industry/sources.json`
+## 3. Fontes: `industry/sources.json`
 
-这是首次启动时导入的示范信源，已经存在的不会被覆盖；之后每次启动只补上文件里有、库里还没有的，从文件里删掉的不会从库里删（不要的在后台暂停）。上线后更常用的是后台“信源”页：能新建、试抓、调频率、暂停、看失败原因。
+São as fontes de exemplo importadas na primeira execução; as que já existem não são sobrescritas. Nas execuções seguintes, só entram as que estão no arquivo e ainda não estão no banco; apagar do arquivo não apaga do banco (pause no painel as que não quiser). Depois do lançamento, o mais prático é a página "Fontes" do painel: criar, testar a coleta, ajustar a frequência, pausar e ver o motivo das falhas.
 
-每个信源的关键字段：
+Os campos principais de cada fonte:
 
-| 字段 | 含义 |
+| Campo | Significado |
 |---|---|
-| `kind` | `rss`、`web_list`（网页列表，配选择器）、`json_list`（JSON 接口）、`x_search`（X 账号，需要 SocialData）、`mp_account`（公众号，需要极致了）、`external`（外部推送） |
-| `config` | 每种信源的配置，见 [信源](sources.md) |
-| `tier` | 信源分级：`T1` 官方一手、`T1_5` 官方账号与准官方、`T2` 媒体与个人、`EXCLUDE_MP` 不参与精选。不同分级的入选门槛不同。`T1` 就是“一手”，不用另外标 |
-| `owner_entity_id` | 可选，这个信源属于哪家公司（`ENTITIES` 的 id）。同一家公司的几个信源在热度里只算一个参与方；`T1_5` 的官方账号要当代表报道，也要填它（见 [信源](sources.md)） |
-| `participation_mode` | `editorial` 进精选和全部动态；`hot_signal` 只作热度证据；`isolated` 不进任何公开页面 |
-| `site_fulltext` | 站内能不能展示全文。**默认关**：只展示摘要和原文链接。只有来源明确允许时才打开 |
-| `syndicate_fulltext` | 全文 RSS 能不能带正文。**默认关**；只在站内也展示全文时生效，来源明确允许转载时才打开 |
+| `kind` | `rss`, `web_list` (página de listagem, com seletores), `json_list` (API JSON), `x_search` (conta do X, precisa de SocialData), `mp_account` (conta oficial do WeChat, precisa de Dajiala), `external` (envio externo) |
+| `config` | A configuração de cada tipo; veja [Fontes](sources.md) |
+| `tier` | Nível da fonte: `T1` oficial de primeira mão, `T1_5` contas oficiais e semioficiais, `T2` imprensa e pessoas, `EXCLUDE_MP` não participa da seleção. Cada nível tem um limite diferente para entrar. `T1` já é "primeira mão", não precisa marcar à parte |
+| `owner_entity_id` | Opcional: a qual empresa a fonte pertence (o id em `ENTITIES`). Várias fontes da mesma empresa contam como um só participante na popularidade; uma conta oficial `T1_5` que deve servir de matéria representativa também precisa disso (veja [Fontes](sources.md)) |
+| `participation_mode` | `editorial` entra na seleção e em todas as notícias; `hot_signal` serve só como evidência de popularidade; `isolated` não aparece em nenhuma página pública |
+| `site_fulltext` | Se o site pode mostrar o texto completo. **Desligado por padrão**: mostra só o resumo e o link do original. Ligue apenas quando a fonte permitir explicitamente |
+| `syndicate_fulltext` | Se o RSS de texto completo pode levar o corpo. **Desligado por padrão**; só vale quando o site também mostra o texto completo, e só deve ser ligado quando a fonte permitir explicitamente a republicação |
 
-中国大陆的很多行业，一手信息在公众号上。公众号信源需要极致了（Dajiala）的 key，按请求计费，有预算熔断。
+## 4. Critério de seleção: `industry/prompts/`
 
-## 4. 精选标准：`industry/prompts/`
+É a etapa que mais vale o seu tempo: o seu conhecimento do setor entra aqui.
 
-这是最值得花时间的一步：你对这个行业的判断经验就写在这里。
-
-| 文件 | 作用 |
+| Arquivo | Para que serve |
 |---|---|
-| `prefilter.md` | 预筛：这条资料是不是这个行业的事。宽召回，只拦明显无关的 |
-| `selection-score.md` | **评分标准**：给 0–100 分。里面有内容类型、五个维度、各类型的权重、必须正常评价的价值、必须压住的噪声 |
-| `content-understanding.md` | 入选和接近入选内容的写法：中文标题、答案先行的摘要、推荐理由（它也会给标签，但页面上的分类和标签来自 `structure.md`） |
-| `rules-domain.md` | 行业术语的翻译与保留规则（示例是 AI 术语：LLM 译作大语言模型、Token 保留英文……） |
-| `mend-wording.md` | 改用词：标题、摘要、推荐理由用了 `industry/wording.ts` 里列出的词时，让模型只改这些词 |
-| `summarize-*.md` | 其他内容的标题摘要写法 |
-| `structure.md` | 分类、标签、主体公司，判断是一条具体新闻还是讲多件事的综合稿，抽出新闻的事实（谁、做了什么、对什么，附原文出处和前提条件）。页面上的分类和标签、主题页、事件归组和日报都靠它 |
-| `group-*.md` | 事件归组：两篇报道是同一次发生、同一事件的后续，还是两件事；同时判断报道相对精选里已有的内容有没有新信息，没有的不进精选 |
-| `story-digest.md` | 事件页的综述（改之前用 [综述评测](story-digest-evaluation.md) 并排比较） |
-| `report-period.md`、`report-period-sections.md` | 周报月报的总述和栏目导读（日报按规则编排，不用提示词） |
-| `translate-*.md` | 全文翻译 |
+| `prefilter.md` | Triagem: o item é do setor ou não. Recolhe amplo e só barra o claramente fora do tema |
+| `selection-score.md` | **Critério de nota**: de 0 a 100. Traz os tipos de conteúdo, as cinco dimensões, os pesos por tipo, os valores que precisam ser avaliados normalmente e o ruído que precisa ser contido |
+| `content-understanding.md` | Como escrever os itens selecionados e os quase selecionados: título em pt-BR, resumo que responde primeiro, motivo para ler (também sugere tags, mas as categorias e tags da página vêm de `structure.md`) |
+| `rules-domain.md` | Regras de tradução e de manter termos do setor (o exemplo é de tecnologia: nomes de produtos e marcas ficam no original…) |
+| `mend-wording.md` | Ajuste de palavras: quando título, resumo ou motivo para ler usam palavras listadas em `industry/wording.ts`, o modelo troca só essas palavras |
+| `summarize-*.md` | Como escrever título e resumo dos demais conteúdos |
+| `structure.md` | Categoria, tags, empresa principal, se é uma notícia específica ou um texto de síntese sobre vários assuntos, e os fatos da notícia (quem, fez o quê, com o quê, com a fonte no original e as condições). As categorias e tags da página, os tópicos, o agrupamento e o resumo diário dependem dele |
+| `group-*.md` | Agrupamento: se duas matérias tratam do mesmo acontecimento, de um desdobramento do mesmo fato ou de dois assuntos; e se a matéria traz informação nova em relação ao que já está na seleção (sem novidade, não entra) |
+| `story-digest.md` | A visão geral na página do fato (antes de mudar, compare versões lado a lado com a [avaliação da visão geral](story-digest-evaluation.md)) |
+| `report-period.md`, `report-period-sections.md` | O resumo geral e as introduções das seções dos resumos semanal e mensal (o diário é montado por regras, sem prompt) |
+| `translate-*.md` | Tradução do texto completo |
 
-你的站有读者文字里不用的词（夸张的说法、方言词、读者看不懂的行话），写进 `industry/wording.ts`：每项是一个正则和改法。写完标题、摘要和推荐理由后逐个查，用了就让模型只改这些词一次（模型步骤“改用词”，环境变量 `WORDING_MODEL` 可以单独选模型）；改完数字有变、标题摘要变空，或模型服务拒绝改写，就保留原文字。词表空着就不查，也不多调用，模型服务拒绝服务时的告警里也不列这一步。
+Se o seu site tem palavras que não devem aparecer no texto para o leitor (exageros, regionalismos, jargão que o leitor não entende), coloque-as em `industry/wording.ts`: cada item é uma expressão regular e a forma de trocar. Depois de escrever título, resumo e motivo para ler, cada um é verificado; se usar alguma, o modelo troca só essas palavras, uma vez (etapa "Ajuste de palavras"; a variável `WORDING_MODEL` escolhe um modelo à parte). Se depois do ajuste algum número mudar, o título ou resumo ficar vazio, ou o serviço de modelo se recusar a reescrever, o texto original é mantido. Com a lista vazia, nada é verificado, não há chamadas extras e essa etapa não aparece no alerta de recusa do serviço de modelo.
 
-提示词里用 `{{siteName}}` 指代站名，`{{> 文件名}}` 引用另一份提示词。改提示词不用改代码。
+Nos prompts, `{{siteName}}` é o nome do site e `{{> nome-do-arquivo}}` inclui outro prompt. Mudar um prompt não exige mudar código.
 
-**建议的做法**：先保留结构（五个维度加权、噪声压制规则、安全边界），只把“什么算重要”“什么算噪声”的例子换成你的行业。比如法律行业，“新法规正式公布、重要判决、监管处罚”应该正常评价，“律所营销软文、课程广告”要压住。
+**Sugestão**: mantenha primeiro a estrutura (cinco dimensões ponderadas, regras de supressão de ruído, limites de segurança) e troque só os exemplos do que "é importante" e do que "é ruído" pelos do seu setor. No setor jurídico, por exemplo, "lei nova publicada, decisão importante, punição de órgão regulador" deve ser avaliada normalmente, e "publieditorial de escritório, propaganda de curso" deve ser contida.
 
-## 5. 门槛与校准：`industry/selection.ts`
+## 5. Limites e calibração: `industry/selection.ts`
 
-两次评分之和 ≥ 2 × 门槛才够分（够分的还要过归组时的去重，见 [精选与校准](selection.md)）。默认门槛（T1 60、T1_5 65、T2 76）是 AIHOT 在 AI 领域校准出来的。`classes` 是抬高门槛的信源类别（示例是 AI 行业的“生态与基础设施”“评测榜单”，换行业时换成你的类别或删空），`browseFloor` 是浏览“全部动态”的最低分（默认 40）。换了行业和提示词，需要重新校准：
+A soma das duas notas precisa ser ≥ 2 × o limite para passar (e quem passa ainda precisa sobreviver à remoção de repetidos no agrupamento; veja [Seleção e calibração](selection.md)). Os limites padrão (T1 60, T1_5 65, T2 76) foram calibrados pelo AIHOT para notícias de IA e ainda não foram recalibrados para tecnologia geral BR. `classes` são categorias de fonte que sobem o limite (no original, "ecossistema e infraestrutura" e "rankings de avaliação" do setor de IA; ao trocar de setor, use as suas categorias ou deixe vazio), e `browseFloor` é a nota mínima para aparecer em "Todas as notícias" (padrão 40). Ao trocar de setor e de prompts, recalibre:
 
-1. 从你的信源里挑 100–200 条资料，自己标“该选 / 不该选”，存成 `.data/gold.jsonl`（格式见 [精选与校准](selection.md)，`industry/gold.example.jsonl` 有两条示例）。
-2. 运行 `node --env-file=.env scripts/eval-selection.ts --gold .data/gold.jsonl`，看准确率、查准率、查全率，和不同门槛下的结果。
-3. 在后台 SelectBench 里逐条看判错的资料，回去改评分提示词或门槛，再跑一遍。
+1. Escolha de 100 a 200 itens das suas fontes, marque você mesmo "deve entrar / não deve entrar" e salve como `.data/gold.jsonl` (formato em [Seleção e calibração](selection.md); `industry/gold.example.jsonl` traz dois exemplos).
+2. Rode `node --env-file=.env scripts/eval-selection.ts --gold .data/gold.jsonl` e veja acurácia, precisão, revocação e os resultados com limites diferentes.
+3. No SelectBench do painel, veja um por um os itens julgados errado, volte e ajuste o prompt de nota ou os limites, e rode de novo.
 
-这一步决定了你的站“选得准不准”。
+É esta etapa que decide se o seu site "escolhe bem".
 
-## 6. 品牌：`site/brand/`
+## 6. Marca: `site/brand/`
 
-- `logo.svg`、`icon.png`（512）、`icon-192.png`、`apple-icon.png`（180）、`favicon.ico`：站点图标。
-- `Logo.tsx`：网页左上角的站名标志，默认用站名文字排出来；有自己的 Logo，把 `Wordmark` 换成你的 SVG，参数保持不变。
-- `wordmark.svg`、`wordmark-dark.svg`（可选）：分享图和海报上的字标，深色版用在深色的分享图上；没有就用站名文字。
-- 分享图的字体（可选，放在 `assets/og-fonts/`）：分享图用 Noto Sans SC 子集（GB2312 + 基本拉丁），繁体、日文汉字、假名、韩文和带变音符的拉丁字母会画不出来。信源有这些文字时，放进 `<名字>-400.ttf` 和 `<名字>-700.ttf`，缺的字依次从这些字体里取（按文件名排序）；换了字体要重启服务，分享图缓存随之换新。不放就和原来一样。
-- `nameplates/`：日报、周报、月报页顶部的报头字（比如“AI日报”）。换了行业词以后重新生成：
+- `logo.svg`, `icon.png` (512), `icon-192.png`, `apple-icon.png` (180), `favicon.ico`: ícones do site.
+- `Logo.tsx`: a marca no canto superior esquerdo do site, por padrão escrita com o nome do site; se tiver um logo próprio, troque `Wordmark` pelo seu SVG, mantendo os parâmetros.
+- `wordmark.svg`, `wordmark-dark.svg` (opcionais): a marca nas imagens de compartilhamento e nos pôsteres; a versão escura vai nas imagens escuras. Sem eles, usa o nome do site em texto.
+- Fontes das imagens de compartilhamento (opcional, em `assets/og-fonts/`): as imagens usam um subconjunto da Noto Sans SC (GB2312 + latim básico), então chinês tradicional, kanji japonês, kana, coreano e letras latinas com acento podem não sair. Como textos em português têm acentos, vale colocar uma fonte com latim estendido como `<nome>-400.ttf` e `<nome>-700.ttf`: os caracteres que faltam são buscados nessas fontes, em ordem de nome de arquivo. Ao trocar a fonte, reinicie o serviço; o cache das imagens é renovado junto. Sem isso, nada muda.
+- `nameplates/`: as palavras do cabeçalho no topo das páginas dos resumos diário, semanal e mensal. Depois de trocar os termos do setor, gere de novo:
   ```bash
   npm pack @fontsource/noto-sans-sc@5.3.0 && tar xzf fontsource-noto-sans-sc-5.3.0.tgz
   node scripts/nameplates.ts package
   ```
-- 关于页的二维码：先在 `site.ts` 的 `ABOUT.maker` 写好作者块，并写上 `wechat`、`feishu` 卡片（标题和说明）；再在后台“设置 → 关于页二维码”上传图片，或者把图片放进 `site/brand/contact/`，文件名以 `qr-wechat`、`qr-feishu` 开头，格式是 png、jpg 或 webp。作者块、卡片或图片缺一样，那张二维码就不显示。
+- QR codes da página "Sobre": primeiro escreva o bloco do autor em `ABOUT.maker` no `site.ts`, com os cartões `wechat` e `feishu` (título e descrição); depois envie as imagens no painel em "Configurações → QR codes da página Sobre", ou coloque-as em `site/brand/contact/` com nome começando por `qr-wechat` ou `qr-feishu`, em png, jpg ou webp. Se faltar o bloco do autor, o cartão ou a imagem, aquele QR code não aparece.
 
-请不要使用 AIHOT 的名字和 Logo。
+Não use o nome nem o logo do AIHOT.
 
-读者可以在“我的”页将字体从“默认字体”改为“浏览器默认字体”。后一项使用读者在浏览器中设置的标准字体，覆盖普通正文、表单和动态图表文字；代码仍用等宽字体，Logo、报头字和分享图片仍按站点品牌显示。字体选择只在当前浏览器保存，不转换简繁体。收藏页的版本 1 备份增加了可选的 `font` 字段，旧备份仍可导入；导入不会覆盖读者已经选择的浏览器字体。
+Na página "Meu", o leitor pode trocar a fonte de "Fonte padrão" para "Fonte padrão do navegador". Essa opção usa a fonte padrão configurada no navegador do leitor para o texto comum, formulários e textos dos gráficos dinâmicos; código continua em fonte monoespaçada, e logo, cabeçalhos e imagens de compartilhamento continuam com a marca do site. A escolha fica salva só naquele navegador. O backup versão 1 da página de salvos ganhou o campo opcional `font`; backups antigos continuam importáveis, e importar não sobrescreve a fonte do navegador que o leitor já escolheu.
 
-## 7. 页面文案：`site/pages/`、`site/public/`、`site/changelog.json`
+## 7. Textos das páginas: `site/pages/`, `site/public/`, `site/changelog.json`
 
-- `pages/terms.md`、`pages/privacy.md`：使用规则和隐私说明。**现在是模板**，上线前按你的实际情况改写，必要时请专业人士看一下。
-- `public/`：网站根目录上的四个固定文件，替换占位符后发布：`robots.txt`、`manifest.webmanifest`（装到手机桌面时的名字和图标）、`openapi-v1.json`（公开 API 的说明），以及可选的 `.well-known/security.txt`（安全问题的联系方式）。只发布这四个文件，放进去的其他文件不会出现在网站上；没有的文件访问时是 404。文件里可以写这些占位符：`{{siteName}}`、`{{siteUrl}}`、`{{description}}`、`{{tagline}}`、`{{locale}}`，出刊时间 `{{dailyTime}}`、`{{weeklyTime}}`、`{{monthlyTime}}`，公开接口版本 `{{version}}`，逗号分隔的公开分类 `{{categoryList}}`；JSON 文件里 `enum` 或 `examples` 列表中的 `"{{categories}}"` 会换成公开分类的 key 列表。
-- `changelog.json`：更新日志。自带一条“网站上线”示例，上线前把它的 `date`、`time` 和 `latestVersion` 改成你的上线时间；示例正文里的框架署名（“用 AIHOT 开源框架搭起了这个站”）同样可留可删。新条目写在最前面，把 `latestVersion` 改成它的日期和时间。`kind` 是“更新”“优化”“公告”“下线”之一；要读者一定看到的加 `"urgent": true`（红色，标“重要”）。
+- `pages/terms.md`, `pages/privacy.md`: termos de uso e política de privacidade. **Hoje são modelos**: reescreva conforme a sua situação antes do lançamento e, se necessário, peça para um profissional revisar (no Brasil, observe a LGPD).
+- `public/`: os quatro arquivos fixos da raiz do site, publicados depois de trocar os marcadores: `robots.txt`, `manifest.webmanifest` (nome e ícone quando instalado na tela do celular), `openapi-v1.json` (descrição da API pública) e o opcional `.well-known/security.txt` (contato para segurança). Só esses quatro são publicados; outros arquivos colocados ali não aparecem no site, e os que faltam dão 404. Os arquivos aceitam estes marcadores: `{{siteName}}`, `{{siteUrl}}`, `{{description}}`, `{{tagline}}`, `{{locale}}`, os horários `{{dailyTime}}`, `{{weeklyTime}}`, `{{monthlyTime}}`, a versão da interface pública `{{version}}` e as categorias públicas separadas por vírgula `{{categoryList}}`; em arquivos JSON, `"{{categories}}"` dentro de listas `enum` ou `examples` vira a lista de keys das categorias públicas.
+- `changelog.json`: o histórico de mudanças. Vem com um exemplo "Site no ar"; antes do lançamento, mude `date`, `time` e `latestVersion` para a data e hora do seu lançamento. A menção ao framework no texto do exemplo ("O site foi montado com o framework de código aberto AIHOT") pode ficar ou sair. Entradas novas vão no início, e `latestVersion` passa a ser a data e hora delas. `kind` é um de "Novidade", "Melhoria", "Aviso" ou "Desativado"; o que o leitor precisa ver de qualquer jeito leva `"urgent": true` (vermelho, marcado como "Importante").
 
-## 8. 模型和部署
+## 8. Modelos e deploy
 
-- 模型：`.env` 里的 `LLM_BASE_URL`、`LLM_API_KEY`、`LLM_MODEL`，任何 OpenAI 兼容接口都行，所有步骤默认都用它。`site/models.ts` 列出具名的模型（各用自己的地址和密钥环境变量）和每一步默认用哪个；部署时还可以用环境变量（见 `.env.example`）或后台“模型与评测”页逐步改选。用推理模型（先想再答）时给它留出推理的额度：默认模型设 `LLM_REASONING_TOKENS`，具名模型在 `site/models.ts` 里写 `reasoningTokens`；不留的话推理会把每一步的输出额度用光，答案为空，每次调用都失败。 评分预设还可写 `scoreCall: { temperature, maxTokens, timeoutMs }`，分别控制温度、输出额度和超时毫秒；示例评分预设已明确配置这些值。备用模型的 `fallbackFor` 按能力名指定它接替的主模型，须先用自己的资料评测这组组合；示例站默认没有备用组合。
-- 部署：见 [部署](deploy.md)。
+- Modelos: `LLM_BASE_URL`, `LLM_API_KEY` e `LLM_MODEL` no `.env`; qualquer API compatível com a da OpenAI serve, e todas as etapas usam esse modelo por padrão. `site/models.ts` lista modelos com nome (cada um com seu endereço e variáveis de chave) e qual cada etapa usa por padrão; no deploy, ainda dá para trocar etapa por etapa pelas variáveis de ambiente (veja `.env.example`) ou na página "Modelos e avaliação" do painel. Com um modelo de raciocínio (que pensa antes de responder), reserve a cota de raciocínio: `LLM_REASONING_TOKENS` para o modelo padrão e `reasoningTokens` no `site/models.ts` para modelos com nome; sem isso, o raciocínio consome toda a cota de saída da etapa, a resposta sai vazia e toda chamada falha. Predefinições de nota também aceitam `scoreCall: { temperature, maxTokens, timeoutMs }`, para temperatura, cota de saída e tempo limite em milissegundos; a predefinição de exemplo já define esses valores. O `fallbackFor` de um modelo reserva indica, pelo nome da capacidade, qual modelo principal ele substitui; avalie essa combinação com os seus próprios dados antes. O site de exemplo não traz combinação reserva.
+- Deploy: veja [Deploy](deploy.md).
 
-## 改完以后检查
+## Verificar depois de mudar
 
 ```bash
 npm run typecheck
-DATABASE_URL=postgres://…/myhot_test npm test     # 库名必须以 _test 或 _ci 结尾，数据库账号要能建库
+DATABASE_URL=postgres://…/myhot_test npm test     # o nome do banco precisa terminar em _test ou _ci, e a conta precisa poder criar bancos
 npm run build -w @aihot/web && npm run test:web
-node scripts/smoke.ts --base http://localhost:3000   # 站点跑起来以后
+node scripts/smoke.ts --base http://localhost:3000   # com o site no ar
 ```
 
-改写提示词、重新校准门槛不会让测试失败：测试按每一步实际渲染出的提示词认请求，门槛从 `industry/selection.ts` 读。`tests/` 里有些测试用的是示例行业的分类、标签和公司（比如 `ai-models`、“模型发布”、Anthropic）。改了 `industry/taxonomy.ts` 以后这些测试会失败，把例子换成你行业里的对应项即可，测的规则本身不用改。
+Reescrever prompts ou recalibrar limites não faz os testes falharem: os testes reconhecem as requisições pelo prompt efetivamente gerado em cada etapa, e os limites vêm de `industry/selection.ts`. Alguns testes em `tests/` usam as categorias, tags e empresas do setor de exemplo (como `dispositivos`, "Lançamento de aparelho", Samsung). Se mudar `industry/taxonomy.ts`, esses testes vão falhar; basta trocar os exemplos pelos equivalentes do seu setor, sem mudar a regra testada.
 
-然后打开网站看一眼首页、全部动态、日报、主题页和关于页，再去后台“信源”页看信源是不是都抓成功了。
+Depois, abra o site e dê uma olhada na página inicial, em todas as notícias, no resumo diário, nos tópicos e na página "Sobre"; e confira na página "Fontes" do painel se todas as fontes foram coletadas com sucesso.
