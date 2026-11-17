@@ -15,7 +15,7 @@ import { DEPLOYMENT, SITE } from "@aihot/site";
  * hosts, are connected here instead, so the
  * connect-time address check still applies. A name sent through the proxy is resolved through it too
  * (egress-proxy.ts), and the tunnel goes to the checked address. "direct" is for paid APIs called
- * straight (SocialData, Dajiala) and the site's own addresses. A listing fetch from a host in
+ * straight (Dajiala) and the site's own addresses. A listing fetch from a host in
  * PRIVATE_FEED_HOSTS is connected directly too.
  */
 export type EgressRoute = "egress" | "direct";
@@ -27,7 +27,7 @@ let pinnedCurve: Agent | null = null;
 let resolveEgress: ReturnType<typeof createEgressResolver> | null = null;
 
 function egressResolver() {
-  return resolveEgress ??= createEgressResolver(config.egressProxyUrl!);
+  return resolveEgress ??= createEgressResolver(config.egressProxyUrl!, config.egressDnsUpstreams);
 }
 
 function hostOf(url: URL): string {
@@ -48,7 +48,7 @@ function destinationPool(origin: string | URL, options: object): Pool {
 
 function dispatcherFor(viaProxy: boolean, privateHost: boolean): Dispatcher | undefined {
   if (viaProxy) {
-    proxyAgent ??= createEgressProxy(config.egressProxyUrl!, egressResolver(), destinationPool);
+    proxyAgent ??= createEgressProxy(config.egressProxyUrl!, egressResolver(), destinationPool, config.egressPinDns);
     return proxyAgent;
   }
   if (config.allowPrivateNetworkFetch) return undefined;

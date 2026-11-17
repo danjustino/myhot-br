@@ -215,7 +215,7 @@ function leadStoryOf(report: ReportDetail): ReportCitation | null {
   return report.sections.flatMap((s) => s.items).find((c) => c.itemId === report.leadItemId && c.available) ?? null;
 }
 
-const WITHDRAWN_NOTE = "Este conteúdo foi retirado ou teve a exibição ajustada a pedido da fonte.";
+const WITHDRAWN_NOTE = "Este conteúdo foi retirado ou teve a exibição ajustada.";
 
 /** The paragraph under the front page's headline: a daily's lead, a weekly or monthly's leading event or overview. */
 function dekOf(report: ReportDetail, leadStory: ReportCitation | null): string | null {

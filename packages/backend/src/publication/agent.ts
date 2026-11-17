@@ -270,7 +270,7 @@ function publicCategoryName(key: PublicApiCategoryKey): string {
 export function agentGuide(): string {
   const u = agentUrl;
   const abilities = serverModules().flatMap((m) => m.agent?.abilities ?? []);
-  const unavailable = serverModules().flatMap((m) => m.agent?.unavailable ?? []);
+  const pages = serverModules().flatMap((m) => m.agent?.pages ?? []);
   const requests = serverModules().flatMap((m) => m.agent?.requests ?? []);
   const categories = PUBLIC_API_CATEGORY_KEYS.map((key) => `${key} (${publicCategoryName(key)})`);
   // Examples use one of the site's configured public categories.
@@ -297,13 +297,13 @@ export function agentGuide(): string {
     `| Resumo diário do ${SITE.name} | ${u("/daily")} (edição mais recente); data específica: ${u("/daily/2026-09-30")} |`,
     `| Os destaques da semana ou do mês (resumos semanal e mensal) | ${u("/weekly")}, ${u("/monthly")} (edição mais recente); edição específica: ${u("/weekly/2026-W39")}, ${u("/monthly/2026-09")} |`,
     ...abilities.map((a) => `| ${a.ask} | ${u(a.path)} |`),
+    ...pages.map((p) => `| ${p.ask} | ${p.where} |`),
     "",
     `Os parâmetros podem ser combinados, por exemplo ${u(`/latest?window=7d&category=${sample}`)}; a palavra-chave precisa ser codificada na URL.`,
     "",
     "## O que ainda não dá para consultar",
     "",
     "- Buscas com mais de 7 dias.",
-    ...unavailable.map((line) => `- ${line}`),
     `- Texto completo de um artigo: dê ao usuário o link da página de leitura do ${SITE.name}; números, citações e outros pontos importantes devem ser conferidos pelo usuário no original.`,
     "",
     "## Como responder",

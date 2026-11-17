@@ -77,6 +77,10 @@ Se uma migração nova encontrar uma trava longa, ela mostra o nome do arquivo e
 
 As notas abaixo trazem o que observar em cada atualização do framework original, da mais nova para a mais antiga.
 
+#### Painel só com senha do admin (15 de novembro de 2026)
+
+O painel não oferece mais login pelo Feishu, só a senha do admin. Ao atualizar, o `setup` roda duas migrações que apagam as identidades do Feishu guardadas no banco (`admin_users.feishu_union_id`, `admin_sessions.auth_claims`), sem nada a fazer à mão. Quem usava o login do Feishu deve definir `ADMIN_PASSWORD` no `.env` (no mínimo 12 caracteres) antes de atualizar; sem isso, sites com páginas de painel se recusam a iniciar em produção. Depois de atualizar, entre com a senha; as sessões antigas do Feishu deixam de valer. `FEISHU_LOGIN_APP_ID`, `FEISHU_LOGIN_APP_SECRET`, `ADMIN_FEISHU_UNION_IDS` e `ADMIN_EMAILS` não são mais lidos e podem sair do `.env`; o aplicativo criado só para login na plataforma aberta do Feishu pode ser desativado. Alertas, encaminhamento de feedback e envio de conteúdo pelo Feishu não mudam. Sites com `ADMIN` igual a `null` em `site/site.ts` (sem páginas de painel) não oferecem mais login no painel nem exigem a senha do admin.
+
 #### Sincronização do motor de 31 de outubro de 2026
 
 Três migrações (`0090`–`0092`), rodadas pelo setup ao atualizar com os comandos acima: as fontes ganham a coluna opcional de classe `selection_class`, e o feedback ganha as colunas `kind` (tipo) e `idea` (sugestão em que se encaixa), todas anuláveis; dados antigos não mudam. Nenhuma variável de ambiente obrigatória nova. Mudanças a observar:
@@ -272,9 +276,9 @@ A página "Execuções" do painel mostra o resultado mais recente de cada tarefa
 
 ### Sessões do admin e mudanças de configuração
 
-A sessão fica ligada à forma de login e às credenciais do admin ou à identidade do Feishu usadas no login. Depois de mudar a senha do admin, a lista de administradores do Feishu ou a chave de sessão, reinicie todos os processos da API para que carreguem a mesma configuração nova; editar o arquivo de configuração não significa que os processos em execução já a usam, e processos com código ou configuração antigos misturados não garantem uma revogação uniforme.
+A sessão fica ligada à senha do admin usada no login. Depois de mudar a senha do admin ou a chave de sessão, reinicie todos os processos da API para que carreguem a mesma configuração nova; editar o arquivo de configuração não significa que os processos em execução já a usam, e processos com código ou configuração antigos misturados não garantem uma revogação uniforme.
 
-Quando a configuração em vigor muda, sessões por senha deixam de aceitar a autorização da senha antiga, e sessões do Feishu são conferidas contra a lista atual pelo union ID ou e-mail obtidos no login (basta um dos dois continuar autorizado). Desativar o aplicativo de login do Feishu ou trocar o ID do aplicativo invalida as sessões do Feishu; só trocar o secret do mesmo aplicativo não derruba sessões do Feishu ainda autorizadas. Trocar ou remover o `SESSION_SECRET` invalida os dois tipos de sessão.
+Quando a configuração em vigor muda, as sessões deixam de aceitar a autorização da senha antiga; trocar ou remover o `SESSION_SECRET` também invalida as sessões.
 
 Sessões confirmadas como inválidas na autenticação são apagadas, e voltar a configuração antiga não as revive. O sistema não guarda histórico global de mudanças de credenciais: se uma mudança de configuração nunca foi carregada por um processo, ou nunca foi notada por uma verificação de sessão antes de ser desfeita, não dá para revogar sessões retroativamente por ela.
 

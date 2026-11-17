@@ -207,7 +207,7 @@ export default function ContentItem({ loaderData }: Route.ComponentProps) {
                     <li key={l.seq} className="flex gap-2">
                       <span className="num text-ink-4">#{l.seq}</span>
                       <Badge tone={l.op === "remove" ? "warn" : "ok"}>{l.op}</Badge>
-                      <span className="num text-ink-4">visível {bj(l.visible_at)} · gravado {bj(l.changed_at)}</span>
+                      <span className="num text-ink-4">gravado {bj(l.changed_at)}</span>
                     </li>
                   ))}
                 </ul>
