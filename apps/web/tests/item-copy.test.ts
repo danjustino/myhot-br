@@ -22,10 +22,10 @@ test("article actions support keyboard navigation and return focus on Escape", a
     web = await startWebServer(api);
     const page = await browser.newPage({ viewport: { width: 1366, height: 900 } });
     await visit(page, web.origin + "/items/keyboard-menu");
-    const trigger = page.getByRole("button", { name: "更多操作", exact: true }).filter({ visible: true });
-    const first = page.getByRole("menuitem", { name: "分享链接", exact: true });
-    const second = page.getByRole("menuitem", { name: "生成分享海报", exact: true });
-    const last = page.getByRole("menuitem", { name: "导出 Markdown", exact: true });
+    const trigger = page.getByRole("button", { name: "Mais ações", exact: true }).filter({ visible: true });
+    const first = page.getByRole("menuitem", { name: "Compartilhar link", exact: true });
+    const second = page.getByRole("menuitem", { name: "Gerar imagem para compartilhar", exact: true });
+    const last = page.getByRole("menuitem", { name: "Exportar Markdown", exact: true });
     await trigger.press("Enter");
     await expect(first).toBeFocused();
     await first.press("ArrowDown");
@@ -66,9 +66,9 @@ test("article actions support keyboard navigation and return focus on Escape", a
     await trigger.press("Enter");
     await first.press("ArrowDown");
     await second.press("Enter");
-    const poster = page.getByRole("dialog", { name: "分享海报", exact: true });
+    const poster = page.getByRole("dialog", { name: "Imagem para compartilhar", exact: true });
     await expect(poster).toBeVisible();
-    await poster.getByRole("button", { name: "关闭", exact: true }).click();
+    await poster.getByRole("button", { name: "Fechar", exact: true }).click();
     await expect(poster).toHaveCount(0);
     await expect(trigger).toBeFocused();
   } finally {
@@ -88,9 +88,9 @@ test("in Safari, pressing the trigger of an open menu closes it", async () => {
     web = await startWebServer(api);
     const page = await browser.newPage({ viewport: { width: 1366, height: 900 } });
     await visit(page, web.origin + "/items/safari-menu");
-    const trigger = page.getByRole("button", { name: "更多操作", exact: true }).filter({ visible: true });
+    const trigger = page.getByRole("button", { name: "Mais ações", exact: true }).filter({ visible: true });
     await trigger.click();
-    await expect(page.getByRole("menuitem", { name: "分享链接", exact: true })).toBeFocused();
+    await expect(page.getByRole("menuitem", { name: "Compartilhar link", exact: true })).toBeFocused();
     await trigger.click();
     await expect(page.getByRole("menu")).toHaveCount(0);
   } finally {
@@ -126,9 +126,9 @@ test("in WeChat, 复制 Markdown copies the article without the async clipboard"
     });
     const page = await context.newPage();
     await visit(page, web.origin + "/items/wechat-copy");
-    await page.getByRole("button", { name: "更多操作" }).filter({ visible: true }).click();
-    await page.getByRole("menuitem", { name: "复制 Markdown" }).click();
-    await expect(page.getByRole("status")).toHaveText("Markdown 已复制");
+    await page.getByRole("button", { name: "Mais ações" }).filter({ visible: true }).click();
+    await page.getByRole("menuitem", { name: "Copiar Markdown" }).click();
+    await expect(page.getByRole("status")).toHaveText("Markdown copiado");
     assert.equal(await page.evaluate(() => (window as { copied?: string }).copied), markdown);
   } finally {
     await browser.close();

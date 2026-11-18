@@ -60,7 +60,7 @@ const PAGES: Array<{ path: string; ready: (page: Page, width: number) => Promise
     path: `/${kind}`,
     ready: async (page: Page) => {
       await expect(page.getByRole("heading", { name: "今日头条", exact: true })).toBeVisible();
-      await expect(page.getByRole("link", { name: "周报", exact: true }).filter({ visible: true })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Resumo semanal", exact: true }).filter({ visible: true })).toBeVisible();
     },
   })),
   {
@@ -68,11 +68,11 @@ const PAGES: Array<{ path: string; ready: (page: Page, width: number) => Promise
     ready: async (page: Page) => {
       await expect(page.getByText("固定推荐理由", { exact: true }).filter({ visible: true })).toBeVisible();
       await expect(page.getByRole("link", { name: "固定主题" }).filter({ visible: true })).toBeVisible();
-      await expect(page.getByRole("link", { name: /原文/ }).filter({ visible: true }).first()).toBeVisible();
-      await page.getByRole("button", { name: "目录", exact: true }).filter({ visible: true }).click();
-      await expect(page.getByRole("dialog", { name: "目录" }).getByRole("link", { name: "第4部分" })).toBeVisible();
+      await expect(page.getByRole("link", { name: /Original/ }).filter({ visible: true }).first()).toBeVisible();
+      await page.getByRole("button", { name: "Sumário", exact: true }).filter({ visible: true }).click();
+      await expect(page.getByRole("dialog", { name: "Sumário" }).getByRole("link", { name: "第4部分" })).toBeVisible();
       await page.keyboard.press("Escape");
-      await expect(page.getByRole("dialog", { name: "目录" })).toBeHidden();
+      await expect(page.getByRole("dialog", { name: "Sumário" })).toBeHidden();
     },
   },
   {
@@ -80,7 +80,7 @@ const PAGES: Array<{ path: string; ready: (page: Page, width: number) => Promise
     ready: async (page: Page, width: number) => {
       // Desktop opens the group in place; phones open it in a sheet.
       if (width < 700) return expect(page.getByRole("link", { name: "代表文章", exact: true })).toBeVisible();
-      await page.getByRole("button", { name: "另外 1 家也报道了" }).filter({ visible: true }).click();
+      await page.getByRole("button", { name: "Mais 1 veículo(s) também noticiaram" }).filter({ visible: true }).click();
       await expect(page.getByRole("link", { name: longTitle })).toBeVisible();
     },
   },
