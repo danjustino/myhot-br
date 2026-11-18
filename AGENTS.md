@@ -43,7 +43,7 @@ Siga o estilo, a nomenclatura e a densidade de comentários do código ao redor.
 
 ## Enviar PR
 
-Este repositório é um fork em pt-BR do [AIHOT](https://github.com/KKKKhazix/AIHOT). Antes de mandar mudanças, leia `CONTRIBUTING.md`. Os casos mais devolvidos em revisão:
+Este repositório é uma adaptação em pt-BR do [AIHOT](https://github.com/KKKKhazix/AIHOT). Antes de mandar mudanças, leia `CONTRIBUTING.md`. Os casos mais devolvidos em revisão:
 
 - **Só entram melhorias que valem para qualquer site.** Chaves novas, novos pontos de configuração e recursos novos, por menores que sejam, são comportamento de produto: abra uma Issue primeiro explicando o caso. As regras, números e exemplos do seu site ficam no seu `industry/` e `site/`, não nos modelos de prompt compartilhados, nos comentários ou nos testes.
 - **Procure o que já existe.** Antes de criar uma função, um ponto de extensão ou uma configuração, pesquise: um módulo que serve seus próprios arquivos usa o `sendFile` de `apps/api/src/routes/static.ts`; para usar um proxy de API, preencha `LLM_BASE_URL`.

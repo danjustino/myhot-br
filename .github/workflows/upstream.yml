@@ -1,0 +1,48 @@
+# Toda segunda-feira, confere se o AIHOT original tem commits que ainda não entraram aqui e mantém uma Issue com a lista.
+# Só avisa: o merge é feito à mão, porque os textos novos chegam em chinês e precisam ser traduzidos.
+name: Novidades do original
+
+on:
+  schedule:
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Compara com o original e atualiza a Issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: Novidades no AIHOT original
+        run: |
+          git fetch --quiet https://github.com/KKKKhazix/AIHOT.git main
+          count=$(git rev-list --count HEAD..FETCH_HEAD)
+          open=$(gh issue list --state open --search "in:title \"$TITLE\"" --json number --jq '.[0].number // empty')
+          if [ "$count" -eq 0 ]; then
+            echo "Nada novo no original."
+            [ -n "$open" ] && gh issue close "$open" --comment "Tudo o que havia no original já foi incorporado."
+            exit 0
+          fi
+          {
+            echo "O [AIHOT original](https://github.com/KKKKhazix/AIHOT) tem **$count commit(s)** que ainda não estão aqui."
+            echo
+            echo "Para incorporar, siga a seção \"Acompanhar o AIHOT original\" do README."
+            echo
+            echo '```'
+            git log --no-merges --format='%h %ad %s' --date=short HEAD..FETCH_HEAD | head -100
+            echo '```'
+          } > body.md
+          if [ -n "$open" ]; then
+            gh issue edit "$open" --body-file body.md
+          else
+            gh issue create --title "$TITLE" --body-file body.md
+          fi

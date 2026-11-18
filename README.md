@@ -78,6 +78,20 @@ A documentação técnica detalhada em [`docs/`](docs/) é a do projeto original
 
 Stack: Node.js 24 · TypeScript · React Router (SSR) · Fastify · PostgreSQL · pg-boss · Tailwind CSS · Docker Compose.
 
+## Acompanhar o AIHOT original
+
+Este projeto não é mais um fork no GitHub, mas continua recebendo as melhorias do [AIHOT](https://github.com/KKKKhazix/AIHOT). Toda segunda-feira a automação `.github/workflows/upstream.yml` confere se o original tem commits novos e, se tiver, abre (ou atualiza) uma Issue "Novidades no AIHOT original" com a lista.
+
+Para incorporar as novidades:
+
+```bash
+git remote add upstream https://github.com/KKKKhazix/AIHOT.git   # só na primeira vez
+git fetch upstream
+git merge upstream/main
+```
+
+Nos conflitos, fique com a estrutura do original e mantenha os textos em pt-BR. Depois, traduza as strings novas que chegarem em chinês, rode `npm run typecheck` e `npm test`, e envie. As migrações do banco nunca são editadas.
+
 ## Créditos e licença
 
 Baseado no [AIHOT](https://github.com/KKKKhazix/AIHOT), de 数字生命卡兹克 (Khazix), publicado sob a [licença MIT](LICENSE). O código continua sob a mesma licença.
