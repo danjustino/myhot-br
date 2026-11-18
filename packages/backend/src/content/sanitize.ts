@@ -14,7 +14,8 @@ const ALLOWED_TAGS = [
 
 /** A class naming a promotion block (msr-promo, promo-box …), not text such as "promotion". */
 const PROMO_CLASS = /(?:^|[-_])promo(?:$|[-_])/i;
-const RELATED_HEADING = /^related (?:articles|posts|stories|content|reading|coverage)$/i;
+// Portuguese headings too: the sources are Brazilian.
+const RELATED_HEADING = /^(?:related (?:articles|posts|stories|content|reading|coverage)|(?:not[ií]cias|mat[eé]rias|artigos|posts|reportagens) relacionad[ao]s|conte[uú]dos? relacionados?|(?:leia|veja) tamb[eé]m|leia mais)$/iu;
 
 /**
  * Drop promotions, related story cards, and non-video source elements before their containers are

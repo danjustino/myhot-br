@@ -159,8 +159,8 @@ test("promotions a feed rotates inside its posts are left out of the body and me
 
 test("related story cards inside feed content do not change the article body or media", async () => {
   const body = '<p>Seven new models are available.</p><img src="/chart.png">';
-  for (const recommendation of ["Model announcement", "Keynote transcript"]) {
-    const html = `${body}<section><h2>Related Stories</h2><div><article><h3><a href="/recommended">${recommendation}</a></h3><img src="/${recommendation}.png"></article></div></section><p>Published on the official blog.</p>`;
+  for (const [heading, recommendation] of [["Related Stories", "Model announcement"], ["Related Stories", "Keynote transcript"], ["Leia também", "Lançamento do modelo"], ["Notícias relacionadas", "Transcrição da palestra"]]) {
+    const html = `${body}<section><h2>${heading}</h2><div><article><h3><a href="/recommended">${recommendation}</a></h3><img src="/${recommendation}.png"></article></div></section><p>Published on the official blog.</p>`;
     pages["/related.xml"] = () => `<rss xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><item><title>Seven models</title><link>https://example.org/post</link><content:encoded><![CDATA[${html}]]></content:encoded></item></channel></rss>`;
     const [item] = (await fetchRss({ id: "test-feed", config: { feedUrl: site + "/related.xml", summaryIsBody: true }, participation_mode: "editorial" } as never)).candidates;
     assert.equal(item!.bodyText, "Seven new models are available. Published on the official blog.");
@@ -168,6 +168,7 @@ test("related story cards inside feed content do not change the article body or 
   }
   const authored = "<section><h2>Related work</h2><p>We compare earlier research.</p></section>";
   assert.match(sanitizeBody(authored), /We compare earlier research/);
+  assert.match(sanitizeBody("<section><h2>Trabalhos relacionados</h2><p>Comparamos pesquisas anteriores.</p></section>"), /Comparamos pesquisas anteriores/);
 });
 
 test("a listing that links other articles in its teasers takes only the links that begin a line", () => {
