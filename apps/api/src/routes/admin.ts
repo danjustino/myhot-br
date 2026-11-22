@@ -15,7 +15,7 @@ import { requeueFailedArticles, runsOverview } from "@aihot/backend/admin/runs";
 import { resolveDelivery } from "@aihot/backend/notify/deliver";
 import { releaseReceipt } from "@aihot/backend/operations/recover";
 import { replaceContactQr, setTargetEnabled, settingsOverview, updateBudget } from "@aihot/backend/admin/settings";
-import { createSource, fetchNow, listSources, previewSource, previewStoredSource, sourceDetail, updateSource } from "@aihot/backend/admin/sources";
+import { createSource, fetchAllNow, fetchNow, listSources, previewSource, previewStoredSource, sourceDetail, updateSource } from "@aihot/backend/admin/sources";
 import { sendProblem } from "../http/respond.ts";
 import { adminHandler } from "./admin-auth.ts";
 
@@ -50,6 +50,7 @@ export function registerAdmin(app: FastifyInstance) {
     const b = body<AdminSourceUpdate>(req);
     return orNotFound(req, reply, await updateSource(param(req, "id"), b, actorOf(admin)));
   }));
+  app.post("/api/admin/sources/fetch-all", adminHandler(async (_req, _reply, admin) => fetchAllNow(actorOf(admin))));
   app.post("/api/admin/sources/:id/preview", adminHandler(async (req, reply) => orNotFound(req, reply, await previewStoredSource(param(req, "id")))));
   app.post("/api/admin/sources/:id/fetch", adminHandler(async (req, reply, admin) => orNotFound(req, reply, await fetchNow(param(req, "id"), actorOf(admin)))));
 

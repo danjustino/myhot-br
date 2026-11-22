@@ -6,7 +6,8 @@ import { SELECTION } from "@aihot/industry/selection";
 import { adminGet } from "../../lib/admin.server";
 import { num } from "../../features/admin/format";
 import { HEALTH_LABEL, KIND_LABEL, MODE_LABEL } from "../../features/admin/labels";
-import { AdminPage, Badge, ButtonLink, Card, DataTable, Dot, FilterChips, healthTone, Input, Pager, Select, Stat, Time } from "../../features/admin/ui";
+import { useAdminAction } from "../../features/admin/action";
+import { AdminPage, Badge, Button, ButtonLink, Card, DataTable, Dot, FilterChips, healthTone, Input, Pager, Select, Stat, Time } from "../../features/admin/ui";
 
 
 
@@ -21,6 +22,7 @@ export default function Sources({ loaderData }: Route.ComponentProps) {
   const { rows, totals, page, useLabels } = loaderData;
   const [sp] = useSearchParams();
   const navigate = useNavigate();
+  const { run, pending } = useAdminAction();
   const pick = (param: string, value: string) => {
     const next = new URLSearchParams(sp);
     if (value) next.set(param, value);
@@ -32,7 +34,14 @@ export default function Sources({ loaderData }: Route.ComponentProps) {
     <AdminPage
       title="Fontes"
       subtitle="Lista ordenada por saúde: as com falha primeiro. Nos detalhes dá para pré-visualizar, coletar na mão e ajustar frequência e participação."
-      actions={<ButtonLink to="/admin/sources/new" tone="primary">Nova fonte</ButtonLink>}
+      actions={
+        <>
+          <Button busy={pending === "fetch-all"} onClick={() => run("POST", "/api/admin/sources/fetch-all", undefined, { label: "fetch-all", success: "Todas as fontes ativas foram para a fila de coleta" })}>
+            Atualizar pautas
+          </Button>
+          <ButtonLink to="/admin/sources/new" tone="primary">Nova fonte</ButtonLink>
+        </>
+      }
     >
       <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="Total" value={num(totals.total)} />

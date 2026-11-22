@@ -290,6 +290,13 @@ export async function createSource(input: unknown, actor: string): Promise<Befor
   return { created: true as const, source: source! };
 }
 
+/** Queues a collection of every enabled source, as the button on each source does. */
+export async function fetchAllNow(actor: string) {
+  const ids = await sql<{ id: string }[]>`SELECT id FROM sources WHERE enabled ORDER BY id`;
+  for (const { id } of ids) await fetchNow(id, actor);
+  return { sources: ids.length };
+}
+
 export async function fetchNow(id: string, actor: string) {
   const [s] = await sql<{ id: string; kind: string; config: Record<string, unknown> }[]>`SELECT id, kind, config FROM sources WHERE id = ${id}`;
   if (!s) return null;
