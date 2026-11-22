@@ -39,6 +39,21 @@ export const PRESETS: Record<string, ModelPreset> = {
     service: "mimo", model: "mimo-v2.6-flash", baseUrlEnv: "XIAOMI_MIMO_BASE_URL", apiKeyEnv: "XIAOMI_MIMO_API_KEY",
     extra: { thinking: { type: "disabled" } }, jsonMode: true,
   },
+  // Planos gratuitos (o provedor pode usar os textos enviados para treinar os modelos dele; aqui só vão notícias públicas).
+  // Mistral: plano Experiment do console. Os aliases -latest acompanham a versão atual de cada modelo.
+  "mistral-small": {
+    service: "mistral", model: "mistral-small-latest", baseUrlEnv: "MISTRAL_BASE_URL", apiKeyEnv: "MISTRAL_API_KEY", jsonMode: true,
+  },
+  // Gemini Flash-Lite: grátis no AI Studio, sem raciocínio por padrão.
+  "gemini-flash-lite": {
+    service: "gemini", model: "gemini-flash-lite-latest", baseUrlEnv: "GEMINI_BASE_URL", apiKeyEnv: "GEMINI_API_KEY", jsonMode: true,
+  },
+  // Modelo local (Ollama na própria máquina, sem custo). Leve o bastante para uma GPU de 8 GB; serve às
+  // etapas que leem muito e respondem pouco (pré-triagem e pontuação). Mais lento: a pontuação ganha 5 min por chamada.
+  local: {
+    service: "ollama", model: "qwen2.5:7b", baseUrlEnv: "LOCAL_LLM_BASE_URL", apiKeyEnv: "LOCAL_LLM_API_KEY", jsonMode: true,
+    scoreCall: { temperature: 0.2, maxTokens: 1024, timeoutMs: 300_000 },
+  },
   "qwen3-vl-flash": {
     service: "dashscope", model: "qwen3-vl-flash", baseUrlEnv: "DASHSCOPE_BASE_URL", apiKeyEnv: "DASHSCOPE_API_KEY",
     extra: { enable_thinking: false }, jsonMode: false, vision: true,

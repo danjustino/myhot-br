@@ -78,6 +78,23 @@ A documentação técnica detalhada em [`docs/`](docs/) é a do projeto original
 
 Stack: Node.js 24 · TypeScript · React Router (SSR) · Fastify · PostgreSQL · pg-boss · Tailwind CSS · Docker Compose.
 
+## Modo híbrido com IA local
+
+A pré-triagem e a pontuação são as etapas com mais chamadas, mas respondem só algumas palavras. Elas podem rodar de graça num modelo local, enquanto o provedor do `LLM_*` continua escrevendo títulos, resumos e agrupamentos.
+
+1. Instale o [Ollama](https://ollama.com) e baixe o modelo: `ollama pull qwen2.5:7b` (cerca de 5 GB; cabe numa GPU de 8 GB).
+2. No Windows, defina a variável de ambiente `OLLAMA_CONTEXT_LENGTH=16384` e reinicie o Ollama. Sem isso, ele corta os textos longos sem avisar.
+3. No `.env`, acrescente:
+   ```
+   LOCAL_LLM_BASE_URL=http://host.docker.internal:11434/v1
+   LOCAL_LLM_API_KEY=ollama
+   PREFILTER_MODEL=local
+   SCORE_MODEL=local
+   ```
+4. Rode `docker compose up -d` de novo.
+
+Também dá para trocar etapa por etapa no painel, em **Modelos e avaliação**. Se o Ollama estiver desligado, essas duas etapas falham até ele voltar.
+
 ## Acompanhar o AIHOT original
 
 Este projeto não é mais um fork no GitHub, mas continua recebendo as melhorias do [AIHOT](https://github.com/KKKKhazix/AIHOT). Toda segunda-feira a automação `.github/workflows/upstream.yml` confere se o original tem commits novos e, se tiver, abre (ou atualiza) uma Issue "Novidades no AIHOT original" com a lista.
