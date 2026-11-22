@@ -27,14 +27,15 @@ function SideLink({ item, dot, active }: { item: NavItem; dot: boolean; active: 
     <IntentLink
       to={item.to}
       aria-current={active ? "page" : undefined}
-      className={`flex h-10 items-center gap-2.5 rounded-control px-2.5 text-[14px] transition-colors duration-150 touch:h-11 ${
+      className={`flex min-h-10 items-center gap-2.5 rounded-control px-2.5 py-1.5 text-[14px] transition-colors duration-150 touch:min-h-11 ${
         active ? "bg-accent/10 font-semibold text-ink dark:bg-accent-soft" : "font-medium text-ink-3 hover:bg-bg-sunk hover:text-ink"
       }`}
     >
       <span className={`flex w-[22px] shrink-0 justify-center ${active ? "text-accent" : ""}`}>
         <Icon size={17} />
       </span>
-      <span className="min-w-0 truncate">{item.label}</span>
+      {/* Two lines rather than an ellipsis: the 180px column cuts "Integração com agentes". */}
+      <span className="min-w-0 leading-[1.25]">{item.label}</span>
       {dot && item.changelog && <span className="ml-auto size-1.5 shrink-0 rounded-full bg-hot" aria-label="Há novidades" />}
     </IntentLink>
   );
