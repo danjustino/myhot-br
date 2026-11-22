@@ -44,6 +44,10 @@ export const PRESETS: Record<string, ModelPreset> = {
   "mistral-small": {
     service: "mistral", model: "mistral-small-latest", baseUrlEnv: "MISTRAL_BASE_URL", apiKeyEnv: "MISTRAL_API_KEY", jsonMode: true,
   },
+  // Ministral 14B: o maior modelo que o plano gratuito libera (o Small e o Medium voltam com limite de uso).
+  "ministral-14b": {
+    service: "mistral", model: "ministral-14b-latest", baseUrlEnv: "MISTRAL_BASE_URL", apiKeyEnv: "MISTRAL_API_KEY", jsonMode: true,
+  },
   // Gemini Flash-Lite: grátis no AI Studio, sem raciocínio por padrão.
   "gemini-flash-lite": {
     service: "gemini", model: "gemini-flash-lite-latest", baseUrlEnv: "GEMINI_BASE_URL", apiKeyEnv: "GEMINI_API_KEY", jsonMode: true,
