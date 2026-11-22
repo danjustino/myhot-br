@@ -11,6 +11,9 @@ import { KINDS, KIND_PATH, archiveGroups, archiveMark, chipLabel, reportPath } f
  * Diário / Semanal / Mensal as the site's pill switch: spread across the archive column, or compact in the phone bar
  * (opening at the top). Every place keeps its own layoutId: all of them stay mounted, hidden by width.
  */
+// Short names: the full "Resumo diário" does not fit three to a row in the 280px column; the group label says "resumo".
+const SWITCH_NAMES: Record<ReportKind, string> = { daily: "Diário", weekly: "Semanal", monthly: "Mensal" };
+
 export function KindSwitch({ kind, phone = false, layoutId = phone ? "report-kind-phone" : "report-kind" }: { kind: ReportKind; phone?: boolean; layoutId?: string }) {
   return (
     <PillTabs
@@ -19,7 +22,7 @@ export function KindSwitch({ kind, phone = false, layoutId = phone ? "report-kin
       layoutId={layoutId}
       label="Alternar entre resumo diário, semanal e mensal"
       active={kind}
-      items={KINDS.map((k) => ({ key: k, label: REPORT_NAMES[k], to: KIND_PATH[k], resetScroll: phone, prefetchOnPress: true }))}
+      items={KINDS.map((k) => ({ key: k, label: SWITCH_NAMES[k], to: KIND_PATH[k], resetScroll: phone, prefetchOnPress: true }))}
     />
   );
 }

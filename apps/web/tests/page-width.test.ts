@@ -60,7 +60,7 @@ const PAGES: Array<{ path: string; ready: (page: Page, width: number) => Promise
     path: `/${kind}`,
     ready: async (page: Page) => {
       await expect(page.getByRole("heading", { name: "今日头条", exact: true })).toBeVisible();
-      await expect(page.getByRole("link", { name: "Resumo semanal", exact: true }).filter({ visible: true })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Semanal", exact: true }).filter({ visible: true })).toBeVisible();
     },
   })),
   {

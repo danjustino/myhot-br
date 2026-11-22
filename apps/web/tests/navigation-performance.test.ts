@@ -137,9 +137,9 @@ test('SSR all-pages and report kinds return offline with their own content',asyn
     await context.setOffline(true);await page.goBack();
     await expect(page.getByRole('link',{name:'全部第 1 页',exact:true})).toBeVisible({timeout:1500});
     await context.setOffline(false);await visit(page,origin+'/daily');
-    await page.getByLabel('Alternar entre resumo diário, semanal e mensal').filter({visible:true}).getByRole('link',{name:'Resumo semanal',exact:true}).click();
+    await page.getByLabel('Alternar entre resumo diário, semanal e mensal').filter({visible:true}).getByRole('link',{name:'Semanal',exact:true}).click();
     await expect(page.locator('#report-start')).toContainText('semanal');
-    await context.setOffline(true);await page.getByLabel('Alternar entre resumo diário, semanal e mensal').filter({visible:true}).getByRole('link',{name:'Resumo diário',exact:true}).click();
+    await context.setOffline(true);await page.getByLabel('Alternar entre resumo diário, semanal e mensal').filter({visible:true}).getByRole('link',{name:'Diário',exact:true}).click();
     await expect(page.locator('#report-start')).toContainText('diário',{timeout:1500});
   }finally{await context.close();}
 });
